@@ -1,4 +1,5 @@
-These folders contain the AUC values from the experiments. They are structured as follows:
+These folders contain the AUC values from the experiments as well as the data used for plotting the progress curves from which the AUC values are calculated. 
+They are structured as follows:
 
 1. improvementHeuristics: results of the experiments with improvement heuristics VNS_DOP, GSR', EA'
   - "bitVector" corresponds to the results with respect to the time measure "subset" (SS)
