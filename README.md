@@ -1,4 +1,4 @@
-# DynamicOrienteeringAlgorithms
+# Dynamic Orienteering Algorithms
 
 Algorithms for Dynamic Orienteering Problems.
 
