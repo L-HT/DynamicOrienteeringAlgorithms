@@ -16,3 +16,5 @@ The command
 library(DynamicOrienteeringProblems)
 ```
 loads the package into the R environment.
+
+Check the "examples" folder to find some examples on how to execute the code.
