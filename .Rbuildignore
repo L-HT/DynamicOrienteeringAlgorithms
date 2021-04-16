@@ -1,2 +1,12 @@
+^instances_changes$
+^instances$
+^initialSolutions$
+^output$
+^solution$
+^tests$
+^tempR$
+^osmparse$
+^additionalFiles$
+^examples$
 ^.*\.Rproj$
 ^\.Rproj\.user$
