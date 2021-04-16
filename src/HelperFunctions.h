@@ -13,7 +13,7 @@
 #include "GraphToList.h"
 #include "ProblemData.h"
 
-#define MYPACKAGE "package:DynamicRouteRescheduling"
+#define MYPACKAGE "package:DynamicOrienteeringAlgorithms"
 #define PLOTFUNCTION "plotNetworkRoute"
 
 #define OP_INSERT 1
