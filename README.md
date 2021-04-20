@@ -8,7 +8,7 @@ This is an R package where the algorithms are implemented in C++ and called usin
 
 Make sure you already have the `devtools` package installed in R. Then you only have to call
 ```
-devtools::install_github("L-HT/DynamicOrienteeringProblems")
+devtools::install_github("L-HT/DynamicOrienteeringAlgorithms", ref="main")
 ```
 to install this package.
 The command
@@ -16,3 +16,5 @@ The command
 library(DynamicOrienteeringProblems)
 ```
 loads the package into the R environment.
+
+Check the "examples" folder to find some examples on how to execute the code.
