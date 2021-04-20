@@ -575,9 +575,15 @@ struct VariableNeighborhoodSearch : public Solver{
         double pathLengthDecrease = 0.0;
 
         if (i == solutionIndices.size() - 1) {
-            pathLengthDecrease += getAndLogDistance(solutionIndices[i], 0)
-            +getAndLogDistance(solutionIndices[i-1], solutionIndices[i])
-            -getAndLogDistance(solutionIndices[i-1], 0);
+            if (solutionIndices.size() == 1) {
+                // edge case
+                pathLengthDecrease += getAndLogDistance(solutionIndices[i], 0)
+                    +getAndLogDistance(0, solutionIndices[i]);
+            } else {
+                pathLengthDecrease += getAndLogDistance(solutionIndices[i], 0)
+                +getAndLogDistance(solutionIndices[i-1], solutionIndices[i])
+                -getAndLogDistance(solutionIndices[i-1], 0);
+            }
         } else {
             if (i == 0) {
                 pathLengthDecrease += getAndLogDistance(0, solutionIndices[0])
