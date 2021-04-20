@@ -4,7 +4,7 @@ library(DynamicOrienteeringAlgorithms)
 library(igraph)
 
 # read instanceData from file
-instanceData <- DynamicRouteRescheduling::convertLGFtoR("./instances/LGF-Leipzig-50-80000-1")
+instanceData <- convertLGFtoR("./instances/LGF-Leipzig-50-80000-1")
 
 # use print(instanceData$problemDf) to see the IDs of the colored nodes
 # the start node has type=2; one way to get the ID of the start node is:

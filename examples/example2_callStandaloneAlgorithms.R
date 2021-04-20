@@ -6,16 +6,17 @@ library(DynamicOrienteeringAlgorithms)
 library(igraph)
 
 # read instanceData from file
-instanceData <- DynamicRouteRescheduling::convertLGFtoR("./instances/LGF-Leipzig-50-80000-1")
+instanceData <- convertLGFtoR("./instances/LGF-Leipzig-50-80000-1")
 
 # call VNS_DOP (abbreviated as VNS) to calculate a solution with a budget of 15000
 # see src/VNS.cpp for the source code
 callVNSSolver(instanceData$nodeDf, 
                   instanceData$arcDf, 
                   instanceData$problemDf, 
-                  15000,
-                  problemName="myTestProblem",
-                  runNumber = 1234
+                  budget = 15000,
+                  problemName= "myTestProblem",
+                  runNumber = 1234,
+                  fileSuffix = ""
                   )
 
 # check the folder "output" to see the log data for this run
