@@ -77,12 +77,12 @@ callRandomImprover <- function(nodeDf, arcDf, problemDf, budget, algoName = "ran
 }
 
 #' @export
-callVNSSolver <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, fileSuffix, pathToChanges = "", pathToDistanceMatrix = "", withLocalSearch = FALSE, withLinKernighan = TRUE, perturbationProbability = 0.15) {
+callVNSSolver <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, fileSuffix = "", pathToChanges = "", pathToDistanceMatrix = "", withLocalSearch = FALSE, withLinKernighan = TRUE, perturbationProbability = 0.15) {
     invisible(.Call('_DynamicOrienteeringAlgorithms_callVNSSolver', PACKAGE = 'DynamicOrienteeringAlgorithms', nodeDf, arcDf, problemDf, budget, problemName, runNumber, fileSuffix, pathToChanges, pathToDistanceMatrix, withLocalSearch, withLinKernighan, perturbationProbability))
 }
 
 #' @export
-callVNSImprover <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges = "", pathToDistanceMatrix = "", withLocalSearch = FALSE, withLinKernighan = TRUE, perturbationProbability = 0.15) {
+callVNSImprover <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix = "", pathToChanges = "", pathToDistanceMatrix = "", withLocalSearch = FALSE, withLinKernighan = TRUE, perturbationProbability = 0.15) {
     invisible(.Call('_DynamicOrienteeringAlgorithms_callVNSImprover', PACKAGE = 'DynamicOrienteeringAlgorithms', nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix, withLocalSearch, withLinKernighan, perturbationProbability))
 }
 
