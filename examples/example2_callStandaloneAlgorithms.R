@@ -27,7 +27,7 @@ callVNSSolver(instanceData$nodeDf,
 
 # if you want to plot this solution:
 # read the solution as a long string and split it into an array of numbers
-testSolution <- readLines("./initialSolutions/myTestProblem_gsr",warn = F)
+testSolution <- readLines("./initialSolutions/myTestProblem_vns",warn = F)
 testSolution <- as.integer(strsplit(testSolution, split = ",")[[1]])
 
 # plot the solution
