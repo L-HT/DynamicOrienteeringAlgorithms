@@ -1,6 +1,4 @@
 CXX_STD = CXX11
-# PKG_LIBS= -lemon
-# PKG_CXXFLAGS =  -I../inst/include -I/work/le/networks/lemon_install/include -I/work/le/networkExperiments/include/lemon
-
+PKG_CXXFLAGS =  -I../inst/include
 # PKG_CXXFLAGS =  -I../inst/include -I/work/le/networks/lemon_install/include -I/work/le/networkExperiments/include/lemon
 CXXFLAGS += -Wall
