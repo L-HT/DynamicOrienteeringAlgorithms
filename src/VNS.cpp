@@ -799,7 +799,7 @@ void callVNSSolver(const Rcpp::DataFrame& nodeDf,
     //////
 
     std::vector<MyGraph::Node> mySolution = vns.asCompleteSolution(vns.bestSolution_);
-    vns.writeSolution(mySolution, false);
+    vns.writeSolution(mySolution, true);
 }
 
 

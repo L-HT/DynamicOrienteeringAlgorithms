@@ -253,5 +253,5 @@ void callRandomImprover(const Rcpp::DataFrame& nodeDf, const Rcpp::DataFrame& ar
 
     std::vector<MyGraph::Node> mySolution = rs.asCompleteSolution(rs.bestSolution_);
 
-    rs.writeSolution(mySolution, true);
+    rs.writeSolution(mySolution, false);
 }
