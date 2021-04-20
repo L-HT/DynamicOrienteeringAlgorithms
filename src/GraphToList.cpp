@@ -13,7 +13,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include <grid_graph.h>
+#include <lemon/grid_graph.h>
 
 #include "GraphToList.h"
 #include "HelperFunctions.h"

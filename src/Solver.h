@@ -2,7 +2,7 @@
 #define SOLVER_H
 
 #include <Rcpp.h>
-#include <grid_graph.h>
+#include <lemon/grid_graph.h>
 #include <fstream>
 #include <chrono>
 

@@ -4,11 +4,11 @@
 #include <Rcpp.h>
 #include <string>
 #include <sstream>
-#include <grid_graph.h>
-#include <list_graph.h>
+#include <lemon/grid_graph.h>
+#include <lemon/list_graph.h>
 #include <stdlib.h>
-#include <lgf_writer.h>
-#include <lgf_reader.h>
+#include <lemon/lgf_writer.h>
+#include <lemon/lgf_reader.h>
 
 #include "GraphToList.h"
 #include "HelperFunctions.h"

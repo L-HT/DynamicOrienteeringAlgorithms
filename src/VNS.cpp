@@ -1,6 +1,6 @@
 #include <Rcpp.h>
-#include <lgf_writer.h>
-#include <list_graph.h>
+#include <lemon/lgf_writer.h>
+#include <lemon/list_graph.h>
 #include <algorithm>
 #include <random>
 #include <cmath>
@@ -754,7 +754,7 @@ void callVNSSolver(const Rcpp::DataFrame& nodeDf,
                                     double budget,
                                     std::string problemName,
                                     unsigned int runNumber,
-                                    std::string fileSuffix,
+                                    std::string fileSuffix = "",
                                     std::string pathToChanges = "",
                                     std::string pathToDistanceMatrix = "",
                                     bool withLocalSearch = false,
@@ -812,7 +812,7 @@ void callVNSImprover(const Rcpp::DataFrame& nodeDf,
                            std::string problemName,
                            unsigned int runNumber,
                            std::string pathToInitialSolution,
-                           std::string fileSuffix,
+                           std::string fileSuffix = "",
                            std::string pathToChanges = "",
                            std::string pathToDistanceMatrix = "",
                            bool withLocalSearch = false,

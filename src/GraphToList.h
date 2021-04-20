@@ -2,8 +2,8 @@
 #define GRAPHTOLIST_H
 
 #include <Rcpp.h>
-#include <list_graph.h>
-#include <grid_graph.h>
+#include <lemon/list_graph.h>
+#include <lemon/grid_graph.h>
 
 #include "ProblemData.h"
 #include "HelperFunctions.h"

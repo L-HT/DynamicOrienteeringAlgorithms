@@ -5,8 +5,8 @@
  * Given a graph and a permutation of the destinations, calculate the duration of a trip
  */
 
-#include <dijkstra.h>
-#include <grid_graph.h>
+#include <lemon/dijkstra.h>
+#include <lemon/grid_graph.h>
 #include <vector>
 #include "GraphToList.h"
 #include "ProblemData.h"

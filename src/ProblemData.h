@@ -2,8 +2,8 @@
 #define PROBLEMDATA_H
 
 #include <Rcpp.h>
-#include <list_graph.h>
-#include <dim2.h>
+#include <lemon/list_graph.h>
+#include <lemon/dim2.h>
 
 #include "DynamicChange.h"
 //#include "HelperFunctions.h"

@@ -1,6 +1,6 @@
 #include <Rcpp.h>
-#include <lgf_writer.h>
-#include <list_graph.h>
+#include <lemon/lgf_writer.h>
+#include <lemon/list_graph.h>
 #include <algorithm>
 #include <ctime>
 #include <random>

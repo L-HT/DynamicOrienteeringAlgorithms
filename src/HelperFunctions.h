@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <chrono>
 #include <random>
-#include <list_graph.h>
+#include <lemon/list_graph.h>
 
 #include "GraphToList.h"
 #include "ProblemData.h"

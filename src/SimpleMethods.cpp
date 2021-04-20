@@ -1,7 +1,7 @@
 #include <vector>
 #include <algorithm>
 #include <random>
-#include <list_graph.h>
+#include <lemon/list_graph.h>
 
 #include "Solver.h"
 #include "HelperFunctions.h"
