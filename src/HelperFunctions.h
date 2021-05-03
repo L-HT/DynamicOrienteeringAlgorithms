@@ -62,7 +62,7 @@ struct AdditionalLogData{
 struct ResultData{
     double length_;
     double value_;
-    ResultData() : length_(-1), value_(-1) {}
+    ResultData() : length_(0), value_(0) {}
     ResultData(double length, double value) : length_(length), value_(value) {}
 
     friend std::ostream& operator<<(std::ostream& os, const ResultData& resultData){

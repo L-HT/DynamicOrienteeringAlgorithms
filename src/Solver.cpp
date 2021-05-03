@@ -102,7 +102,14 @@ ResultData Solver::evaluateSolution(ProblemData& problemData,
     if (dataHasChanged) {
 
         bestSolutionQuality_ = evaluateSolution(problemData_, bestSolution_, targetCriterion, false, true, distanceMatrix);
-
+        
+        // What if this solution is invalid after the change?
+        // set bestSolution=c() and bestSolutionQuality_=0
+        if (bestSolutionQuality_.length_ > problemData.budget_) {
+            bestSolutionQuality_ = ResultData();
+            bestSolution_ = std::vector<MyGraph::Node>();
+            forceLogging = true;
+        }
     }
 
     ResultData oldBestQuality = bestSolutionQuality_;
@@ -114,7 +121,7 @@ ResultData Solver::evaluateSolution(ProblemData& problemData,
 
 
     // write best solution into a file every time it is updated
-    if (newQuality > oldBestQuality || newQuality.length_ <= problemData.budget_){
+    if (newQuality > oldBestQuality && newQuality.length_ <= problemData.budget_){
         // writeSolution(solution, !calledAsImprover_);
     }
     return newQuality;
