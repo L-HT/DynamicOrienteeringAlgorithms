@@ -106,10 +106,7 @@ ResultData Solver::evaluateSolution(ProblemData& problemData,
         // What if this solution is invalid after the change?
         // set bestSolution=c() and bestSolutionQuality_=0
         if (bestSolutionQuality_.length_ > problemData.budget_) {
-<<<<<<< HEAD
             Rcpp::Rcout << "Best solution has become invalid!" << "\n";
-=======
->>>>>>> e35046aec7d0df5875b46a2fde3e0af4a6571a7e
             bestSolutionQuality_ = ResultData();
             bestSolution_ = std::vector<MyGraph::Node>();
             forceLogging = true;
