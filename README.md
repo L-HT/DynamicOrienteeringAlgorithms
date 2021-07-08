@@ -18,3 +18,5 @@ library(DynamicOrienteeringProblems)
 loads the package into the R environment.
 
 Check the "examples" folder to find some examples on how to execute the code.
+
+Check [Releases](https://github.com/L-HT/DynamicOrienteeringAlgorithms/releases) for previous versions of the code.
