@@ -1,5 +1,4 @@
-These folders contain the AUC values from the experiments as well as the data used for plotting the averaged progress curves from which the AUC values are calculated. 
-They are structured as follows:
+These folders contain the results from the experiments performed in the extended paper.
 
  - "results_dynamicBudget" contains the results for the experiments with dynamic budgets:
  	- scatterplots comparing the different handling mechanisms
