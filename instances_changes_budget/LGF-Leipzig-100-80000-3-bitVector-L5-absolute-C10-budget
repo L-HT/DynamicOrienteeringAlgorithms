@@ -1,0 +1,6 @@
+changeID,absoluteTime,evaluation,bitVector,distanceEvaluation,typeOfChange,affected,affectedID1,affectedID2,change,totalAfterChange
+1,0,0,166666,0,absolute,node,-1,-1,3045.19599676132,0
+2,0,0,333333,0,absolute,node,-1,-1,-5432.94695392251,0
+3,0,0,5e+05,0,absolute,node,-1,-1,-595.79537063837,0
+4,0,0,666666,0,absolute,node,-1,-1,5199.6563822031,0
+5,0,0,833333,0,absolute,node,-1,-1,-7028.98267656565,0
