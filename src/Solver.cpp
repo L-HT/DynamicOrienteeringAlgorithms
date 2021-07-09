@@ -69,6 +69,11 @@ Solver::Solver(ProblemData& problemData,
     //     }
     //     Rcpp::Rcout << "\n";
     // }
+    
+    minBudget_ = 0;
+    maxBudget_ = 0;
+    tableSize_ = 0;
+    typeOfHandling_ = 0;
 }
 
 std::vector<MyGraph::Node> Solver::appendStartNode(std::vector<MyGraph::Node>& solution){
@@ -86,8 +91,6 @@ ResultData Solver::evaluateSolution(ProblemData& problemData,
                      bool abortOnInvalidity,
                      Rcpp::NumericMatrix* distanceMatrix){
 
-
-
     /*
      * check for changes in the problem instance:
      * Is there a change in the queue? Implement it and remove it from queue.
@@ -96,20 +99,58 @@ ResultData Solver::evaluateSolution(ProblemData& problemData,
      */
 
 
-
+    int oldBudget = problemData_.budget_;
     bool dataHasChanged = checkForAndImplementChanges(problemData, additionalLogData_, startTime_);
-
+    bool budgetHasChanged = oldBudget != problemData_.budget_;
+    
     if (dataHasChanged) {
 
         bestSolutionQuality_ = evaluateSolution(problemData_, bestSolution_, targetCriterion, false, true, distanceMatrix);
         
-        // What if this solution is invalid after the change?
-        // set bestSolution=c() and bestSolutionQuality_=0
-        if (bestSolutionQuality_.length_ > problemData.budget_) {
-            Rcpp::Rcout << "Best solution has become invalid!" << "\n";
-            bestSolutionQuality_ = ResultData();
-            bestSolution_ = std::vector<MyGraph::Node>();
+        if (budgetHasChanged) {
+            // What if this solution is invalid after the change?
+            // set bestSolution=c() and bestSolutionQuality_=0
+            if (bestSolutionQuality_.length_ > problemData.budget_) {
+                Rcpp::Rcout << "Best solution has become invalid!" << "\n";
+
+                switch(typeOfHandling_){
+                    case(HANDLING_FIX_VIOLATION): // HANDLING BY FIXING THE VIOLATION
+                        repairSolutionByCriterion(REMOVAL_CRITERION_LENGTH, bestSolution_, bestSolutionQuality_);
+                        Rcpp::Rcout << "Handling by HANDLING_FIX_VIOLATION: " << bestSolutionQuality_ << "\n";
+                        break;
+                    case(HANDLING_FIX_SPARINGLY): // HANDLING BY REMOVING SMALLEST VALUE ELEMENTS
+                        repairSolutionByCriterion(REMOVAL_CRITERION_VALUE, bestSolution_, bestSolutionQuality_);
+                        Rcpp::Rcout << "Handling by HANDLING_FIX_SPARINGLY: " << bestSolutionQuality_ << "\n";
+                        break;
+                    case(HANDLING_TABLE): // HANDLING BY TABLE
+                        // invalidate the current solution; the actual fixing is done below
+                        bestSolutionQuality_ = ResultData();
+                        bestSolution_.clear();
+                        break;
+                    case(HANDLING_RESTART): // HANDLING BY RESTARTING THE ALGORITHM
+                        resetSolver();
+                        break;
+                    default:
+                        bestSolutionQuality_ = ResultData();
+                        bestSolution_.clear();
+                        break;
+                }
+            }
+            
+            // HANDLING BY TABLE (put here so that this is also called when the budget increases)
+            // this code also deals with the case when the budget increases
+            if (typeOfHandling_ == HANDLING_TABLE) {
+                EvaluatedSolution bestEvaluatedSolution = getBestSolutionForBudget(problemData.budget_);
+                if (bestSolutionQuality_ < bestEvaluatedSolution.resultData_) {
+                    // if bestSolution_ is still valid and better, then do not change the solution
+                    // if bestSolution_ is invalid, this code is always executed
+                    bestSolution_ = bestEvaluatedSolution.solution_;
+                    bestSolutionQuality_ = bestEvaluatedSolution.resultData_;
+                    Rcpp::Rcout << "Handling by table: " << bestSolutionQuality_ << "\n";
+                }
+            }
             forceLogging = true;
+            
         }
     }
 
@@ -120,12 +161,23 @@ ResultData Solver::evaluateSolution(ProblemData& problemData,
                                                     bestSolutionQuality_, bestSolution_,
                                                     forceLogging, abortOnInvalidity, distanceMatrix);
 
-
+    // update table if budget changes are handled with a table
+    if (typeOfHandling_ == HANDLING_TABLE) {
+        updateTable(solution, newQuality);
+    }
+    
     // write best solution into a file every time it is updated
     if (newQuality > oldBestQuality && newQuality.length_ <= problemData.budget_){
         // writeSolution(solution, !calledAsImprover_);
     }
     return newQuality;
+}
+ResultData Solver::evaluateSolutionMatrix(ProblemData& problemData,
+                                  const std::vector<MyGraph::Node>& solution,
+                                  std::string targetCriterion,
+                                  bool forceLogging,
+                                  bool abortOnInvalidity){
+    return evaluateSolution(problemData, solution, targetCriterion, forceLogging, abortOnInvalidity, &distanceMatrix_);
 }
 
 /*
@@ -155,6 +207,13 @@ bool Solver::terminationCriterionSatisfied(){
         && additionalLogData_.numberOfShortestPathCalls_ >= 1000000;
 }
 Solver::~Solver(){
+    if (typeOfHandling_ == HANDLING_TABLE) {
+        std::map<int, EvaluatedSolution>::iterator it;
+        for (it = bestSolutionsByBudget_.begin(); it != bestSolutionsByBudget_.end(); it++){
+            Rcpp::Rcout << "B=" << it->first << ": " << it->second.resultData_ << "\n";
+        }
+    }
+    
     logFile_.close();
 }
 
@@ -219,6 +278,15 @@ void Solver::writeSolution(const std::vector<MyGraph::Node>& solution, bool isIn
     }
 
     writeSolutionIntoFile(problemData_, solution, ss.str());
+}
+
+double Solver::getAndLogDistance(int i, int j){
+    additionalLogData_.numberOfShortestPathCalls_++;
+    return distanceMatrix_(i,j);
+}
+
+void Solver::resetSolver() {
+    // don't do anything
 }
 // void Solver::writeBestSolution(){
 //   std::ofstream myfile;

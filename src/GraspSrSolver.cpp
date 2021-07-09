@@ -17,7 +17,8 @@ using namespace lemon;
 
 struct GraspSrSolver : public Solver{
     std::vector<MyGraph::Node> currentSolution_;
-
+    ResultData currentSolutionRes_;
+    
     // a second "best" solution which is needed in the algorithm but works differently from the best solution defined by Solver
     std::vector<MyGraph::Node> tempBestSolution_;
     ResultData tempBestSolutionRes_;
@@ -25,8 +26,6 @@ struct GraspSrSolver : public Solver{
     std::random_device rd;
     std::mt19937 gen;
     std::uniform_real_distribution<double> randomNumber; //Intervall [0,1)
-
-    ResultData currentSolutionRes_;
 
     // Rcpp::NumericMatrix distanceMatrix_;
 
@@ -52,18 +51,26 @@ struct GraspSrSolver : public Solver{
 
         Rcpp::Rcout << "start " << algorithmName_  <<  std::endl;
 
-        if (initialSolution_.empty()){
+        if (initialSolution_.empty() && !calledAsImprover_){
             Rcpp::Rcout << "start " << algorithmName_ << " (Solver)" << std::endl;
             // waitForInput("beforeAddVertex", DEBUG_ENABLED);
 
-            while (addVertex()) {
-                Rcpp::Rcout << "current: ";
-                printNodeIdsOfVector(problemData_, currentSolution_);
-                additionalLogData_.currentIteration_++;
+            // while (addVertex()) {
+            //     // Rcpp::Rcout << "current: ";
+            //     // printNodeIdsOfVector(problemData_, currentSolution_);
+            //     additionalLogData_.currentIteration_++;
+            // }
+            callAddVertexRepeatedly();
+            if (currentSolutionRes_.length_ > problemData_.budget_) {
+                Rcpp::stop("Error1: addVertex() ended with invalid solution!");
             }
-
             tempBestSolution_.assign(currentSolution_.begin(), currentSolution_.end());
             tempBestSolutionRes_ = currentSolutionRes_;
+            // check bestSolution vs. tempBestSolution
+            if (tempBestSolutionRes_ > bestSolutionQuality_ && tempBestSolutionRes_.length_ < problemData_.budget_) {
+                bestSolution_.assign(tempBestSolution_.begin(), tempBestSolution_.end());
+                bestSolutionQuality_ = tempBestSolutionRes_;
+            }
             printNodeIdsOfVector(problemData_, currentSolution_);
 
             // waitForInput("beforeLS", DEBUG_ENABLED);
@@ -88,19 +95,38 @@ struct GraspSrSolver : public Solver{
             }
         } else {
             Rcpp::Rcout << "start " << algorithmName_ << " (improvement heuristic)" << std::endl;
-            currentSolution_.assign(initialSolution_.begin(), initialSolution_.end());
-            currentSolutionRes_ = evaluateSolutionMatrix(problemData_, currentSolution_);
-            bestSolution_.assign(initialSolution_.begin(), initialSolution_.end());
-            bestSolutionQuality_ = currentSolutionRes_;
-            tempBestSolution_.assign(initialSolution_.begin(), initialSolution_.end());
+            
+            if (initialSolution_.empty()){
+                Rcpp::Rcout << "GSR was called as improvement heuristic, but without initial solution. Call addVertex()...\n";
+                // if currentSolution_ is still empty after the while-loop, it is
+                // possible that no valid solution exists, but 
+                // the budget might increase over time, so keep searching
+                callAddVertexRepeatedly();
+                if (currentSolutionRes_.length_ > problemData_.budget_) {
+                    Rcpp::stop("Error2: callAddVertexRepeatedly() ended with invalid solution!");
+                }
+            } else {
+                // Rcpp::Rcout << "assignments\n";
+                currentSolution_.assign(initialSolution_.begin(), initialSolution_.end());
+                currentSolutionRes_ = evaluateSolutionMatrix(problemData_, currentSolution_);
+                bestSolution_.assign(initialSolution_.begin(), initialSolution_.end());
+                bestSolutionQuality_ = currentSolutionRes_;
+                // if (currentSolutionRes_.length_ > problemData_.budget_) {
+                //     Rcpp::stop("Error3: Initial solution is invalid!");
+                // }
+            }
+            
+            tempBestSolution_.assign(currentSolution_.begin(), currentSolution_.end());
             tempBestSolutionRes_ = currentSolutionRes_;
-
+            // printNodeIdsOfVector(problemData_, currentSolution_);
             /*
-            * idea for anytime-variant for GRASP-SR:
-            * -remove a random segment from the path
+            *  anytime-variant for GRASP-SR:
+            * -removes a random segment from the path
             */
             do {
                 // waitForInput("start of big-do",true);
+                // Rcpp::Rcout << "big do\n";
+                // Rcpp::Rcout << "sizetempbest: " << tempBestSolution_.size() << "\n";
                 while (localSearch()) {additionalLogData_.currentIteration_++;}
 
                 if (currentSolution_.size() > 1){
@@ -118,14 +144,22 @@ struct GraspSrSolver : public Solver{
                     currentSolution_.erase(currentSolution_.begin() + r1, currentSolution_.begin() + r2);
                 } else {
                     Rcpp::Rcerr << "Local search yielded empty solution or just a single node. Call addVertex()..." << std::endl;
-                    while (addVertex()) {
-                        Rcpp::Rcout << "current: ";
-                        printNodeIdsOfVector(problemData_, currentSolution_);
-                        additionalLogData_.currentIteration_++;
+                    // while (addVertex()) {
+                    //     // Rcpp::Rcout << "current: ";
+                    //     // printNodeIdsOfVector(problemData_, currentSolution_);
+                    //     additionalLogData_.currentIteration_++;
+                    // }
+                    callAddVertexRepeatedly();
+                    if (currentSolutionRes_.length_ > problemData_.budget_) {
+                        Rcpp::stop("Error4: callAddVertexRepeatedly() (in subcase) ended with invalid solution!");
                     }
-
                     tempBestSolution_.assign(currentSolution_.begin(), currentSolution_.end());
                     tempBestSolutionRes_ = currentSolutionRes_;
+                    // check bestSolution vs. tempBestSolution
+                    if (tempBestSolutionRes_ > bestSolutionQuality_ && tempBestSolutionRes_.length_ < problemData_.budget_) {
+                        bestSolution_.assign(tempBestSolution_.begin(), tempBestSolution_.end());
+                        bestSolutionQuality_ = tempBestSolutionRes_;
+                    }
                     printNodeIdsOfVector(problemData_, currentSolution_);
 
                 }
@@ -138,6 +172,7 @@ struct GraspSrSolver : public Solver{
     bool addVertex(MyGraph::Node blockedNode = lemon::INVALID){
         // Paper: length of path (with start and end node) - 1; here: cS.size() is only path without start/end;
         // thus: (cS.size()+2)-1 equals l as found in paper; ergo +1 necessary
+        // std::vector<MyGraph::Node> path_r(currentSolution.begin(), currentSolution.end());
         std::size_t l = currentSolution_.size()+1;
 
         std::vector<std::vector<MyGraph::Node>> candidateList;
@@ -335,6 +370,17 @@ struct GraspSrSolver : public Solver{
     }
 
     bool localSearch(){
+       
+        if (tempBestSolution_.empty()){
+            callAddVertexRepeatedly();
+            if (currentSolutionRes_.length_ > problemData_.budget_) {
+                Rcpp::Rcout << "length / budget: " << currentSolutionRes_.length_ << " / " << problemData_.budget_ << "\n";
+                Rcpp::stop("Error5: callAddVertexRepeatedly() (in localSearch()) ended with invalid solution!");
+            }
+            tempBestSolution_.assign(currentSolution_.begin(), currentSolution_.end());
+            tempBestSolutionRes_ = currentSolutionRes_;
+        }
+        
         std::size_t l = tempBestSolution_.size() - 1;
         bool improved = false;
 
@@ -365,8 +411,9 @@ struct GraspSrSolver : public Solver{
 
             // printNodeIdsOfVector(problemData_, currentSolution_);
             // waitForInput("iffy", DEBUG_ENABLED);
-            if (currentSolutionRes_.value_ > tempBestSolutionRes_.value_ || (currentSolutionRes_.value_ == tempBestSolutionRes_.value_ && currentSolutionRes_.length_ < tempBestSolutionRes_.length_)){
+            if (currentSolutionRes_  > tempBestSolutionRes_ && currentSolutionRes_.length_ <= problemData_.budget_){
                 // bestSolution_ is not overwritten here because this already happens during the calls to evaluateSolution
+                tempBestSolution_.assign(currentSolution_.begin(), currentSolution_.end());
                 tempBestSolutionRes_ = currentSolutionRes_;
                 improved = true;
             }
@@ -378,16 +425,171 @@ struct GraspSrSolver : public Solver{
         }
         return improved;
     }
-
-    ResultData evaluateSolutionMatrix(ProblemData& problemData,
-                                      const std::vector<MyGraph::Node>& solution,
-                                      std::string targetCriterion = "value",
-                                      bool forceLogging = false,
-                                      bool abortOnInvalidity = true){
-
-        ResultData res = evaluateSolution(problemData_, solution, targetCriterion, forceLogging, abortOnInvalidity, &distanceMatrix_);
-        return res;//evaluateSolution(problemData_, solution, targetCriterion, forceLogging, abortOnInvalidity, &distanceMatrix_);
+    
+    void callAddVertexRepeatedly() {
+        // if currentSolution_ is still empty after the while-loop, it is
+        // possible that no valid solution exists, but 
+        // the budget might increase over time, so keep searching
+        do{
+            while (addVertex()) {
+                // Rcpp::Rcout << "current: ";
+                // printNodeIdsOfVector(problemData_, currentSolution_);
+                additionalLogData_.currentIteration_++;
+            }
+        } while ((currentSolutionRes_.length_ > problemData_.budget_ || currentSolution_.empty()) && !terminationCriterionSatisfied());
+        
+        // terminationCriterion satisfied, but still empty solution
+        // -> no valid solution exists 
+        if (terminationCriterionSatisfied()) {
+            Rcpp::Rcout << "currentSolutionQuality_:" << currentSolutionRes_ << "\n"; 
+            Rcpp::Rcout << "Final budget: " << problemData_.budget_ << "\n";
+            Rcpp::Rcout << additionalLogData_ << "\n";
+            Rcpp::stop("Termination criterion satisfied, but no valid solution was found with addVertex(). It is possible that no valid solution exists.");
+        }
     }
+    void resetSolver() override{
+        if (initialSolutionBackup_.empty()) {
+            initialSolutionBackup_.assign(initialSolution_.begin(), initialSolution_.end());
+            initialSolutionQuality_ =  evaluateSolutionMatrix(problemData_, initialSolutionBackup_);
+        }
+        if (initialSolutionQuality_.length_ > problemData_.budget_){
+            initialSolution_.clear();
+            bestSolution_.clear();
+            bestSolutionQuality_ = ResultData();
+            tempBestSolution_.clear();
+            tempBestSolutionRes_ = ResultData();
+            currentSolution_.clear();
+            currentSolutionRes_ = ResultData();
+            Rcpp::Rcout << "Restart algorithm with empty initial solution.\n";
+        } else {
+            initialSolution_.assign(initialSolutionBackup_.begin(), initialSolutionBackup_.end());
+            bestSolution_.assign(initialSolution_.begin(), initialSolution_.end());
+            bestSolutionQuality_ = initialSolutionQuality_;
+            tempBestSolution_.assign(initialSolution_.begin(), initialSolution_.end());
+            tempBestSolutionRes_ = bestSolutionQuality_;
+            currentSolution_.assign(initialSolution_.begin(), initialSolution_.end());
+            currentSolutionRes_ = bestSolutionQuality_;
+            Rcpp::Rcout << "Restart algorithm with the given initial solution.\n";
+        }
+        Rcpp::Rcout << "Current log data: " << additionalLogData_ << "\n";
+        run(); 
+        
+        std::vector<MyGraph::Node> mySolution = asCompleteSolution(bestSolution_);
+        writeSolution(mySolution, !calledAsImprover_);
+        Rcpp::Rcout << "Log data at the end:" << additionalLogData_ << "\n";
+        Rcpp::stop("Algorithm used restarts, but the termination criterion is now satisfied");
+    }
+    
+    ResultData evaluateSolution(ProblemData& problemData,
+                                const std::vector<MyGraph::Node>& solution,
+                                std::string targetCriterion,
+                                bool forceLogging,
+                                bool abortOnInvalidity,
+                                Rcpp::NumericMatrix* distanceMatrix) override{
+        
+        int oldBudget = problemData_.budget_;
+        bool dataHasChanged = checkForAndImplementChanges(problemData, additionalLogData_, startTime_);
+        bool budgetHasChanged = oldBudget != problemData_.budget_;
+        
+        if (dataHasChanged) {
+            
+            bestSolutionQuality_ = evaluateSolution(problemData_, bestSolution_, targetCriterion, false, true, distanceMatrix);
+            
+            if (budgetHasChanged) {
+                // What if this solution is invalid after the change?
+                // set bestSolution=c() and bestSolutionQuality_=0
+                if (bestSolutionQuality_.length_ > problemData.budget_) {
+                    Rcpp::Rcout << "Best solution has become invalid!!!" << "\n";
+                    
+                    /*
+                     * TODO: Wird tempBestSolution manipuliert, obwohl die Lösung ungültig ist?
+                     */
+                    switch(typeOfHandling_){
+                    case(HANDLING_FIX_VIOLATION): // HANDLING BY FIXING THE VIOLATION
+                        repairSolutionByCriterion(REMOVAL_CRITERION_LENGTH, tempBestSolution_, tempBestSolutionRes_);
+                        Rcpp::Rcout << "handle tempBestSolution_: " << tempBestSolutionRes_ << "\n";
+                        repairSolutionByCriterion(REMOVAL_CRITERION_LENGTH, bestSolution_, bestSolutionQuality_);
+                        Rcpp::Rcout << "Handling by HANDLING_FIX_VIOLATION: " << bestSolutionQuality_ << "\n";
+                        break;
+                    case(HANDLING_FIX_SPARINGLY): // HANDLING BY REMOVING SMALLEST VALUE ELEMENTS
+                        repairSolutionByCriterion(REMOVAL_CRITERION_VALUE, tempBestSolution_, tempBestSolutionRes_);
+                        repairSolutionByCriterion(REMOVAL_CRITERION_VALUE, bestSolution_, bestSolutionQuality_);
+                        // repairSolutionByCriterion(REMOVAL_CRITERION_VALUE, currentSolution_, currentSolutionRes_);
+                        // evaluateSolutionMatrix(problemData_, tempBestSolution_);
+                        Rcpp::Rcout << "Handling by HANDLING_FIX_SPARINGLY: " << bestSolutionQuality_ << "\n";
+                        break;
+                    case(HANDLING_TABLE): // HANDLING BY TABLE
+                        // invalidate the current solution; the actual fixing is done below
+                        bestSolutionQuality_ = ResultData();
+                        bestSolution_.clear();
+                        break;
+                    case(HANDLING_RESTART): // HANDLING BY RESTARTING THE ALGORITHM
+                        resetSolver();
+                        break;
+                    default:
+                        bestSolutionQuality_ = ResultData();
+                        bestSolution_.clear();
+                        currentSolutionRes_ = ResultData();
+                        currentSolution_.clear();
+                        tempBestSolutionRes_ = ResultData();
+                        tempBestSolution_.clear();
+                    break;
+                    }
+                }
+                
+                // HANDLING BY TABLE (put here so that this is also called when the budget increases)
+                // this code also deals with the case when the budget increases
+                if (typeOfHandling_ == HANDLING_TABLE) {
+                    EvaluatedSolution bestEvaluatedSolution = getBestSolutionForBudget(problemData.budget_);
+                    if (bestSolutionQuality_ < bestEvaluatedSolution.resultData_) {
+                        // if bestSolution_ is still valid and better, then do not change the solution
+                        // if bestSolution_ is invalid, this code is always executed
+                        bestSolution_.assign(bestEvaluatedSolution.solution_.begin(), bestEvaluatedSolution.solution_.end());
+                        bestSolutionQuality_ = bestEvaluatedSolution.resultData_;
+                        tempBestSolution_.assign(bestEvaluatedSolution.solution_.begin(), bestEvaluatedSolution.solution_.end());
+                        tempBestSolutionRes_ = bestEvaluatedSolution.resultData_;
+                        Rcpp::Rcout << "Handling by table: " << bestSolutionQuality_ << "\n";
+                    }
+                }
+                forceLogging = true;
+                
+            }
+        }
+        
+        ResultData oldBestQuality = bestSolutionQuality_;
+        ResultData newQuality = getAndLogSolutionQuality(problemData, solution,
+                                                         targetCriterion,
+                                                         logFile_, startTime_, additionalLogData_,
+                                                         bestSolutionQuality_, bestSolution_,
+                                                         forceLogging, abortOnInvalidity, distanceMatrix);
+        
+        // update table if budget changes are handled with a table
+        if (typeOfHandling_ == HANDLING_TABLE) {
+            updateTable(solution, newQuality);
+        }
+        
+        // if (tempBestSolutionRes_ > bestSolutionQuality_ && tempBestSolutionRes_.length_ < problemData_.budget_) {
+        //     bestSolution_.assign(tempBestSolution_.begin(), tempBestSolution_.end());
+        //     // Rcpp::Rcout << "temp/best/budget: " << tempBestSolutionRes_.length_ << "/" << bestSolutionQuality_.length_ << "/" <<
+        //     //     problemData_.budget_ << "\n";
+        //     bestSolutionQuality_ = tempBestSolutionRes_;
+        // }
+        // write best solution into a file every time it is updated
+        if (newQuality > oldBestQuality && newQuality.length_ <= problemData.budget_){
+            // writeSolution(solution, !calledAsImprover_);
+        }
+        return newQuality;
+    }
+
+    // ResultData evaluateSolutionMatrix(ProblemData& problemData,
+    //                                   const std::vector<MyGraph::Node>& solution,
+    //                                   std::string targetCriterion = "value",
+    //                                   bool forceLogging = false,
+    //                                   bool abortOnInvalidity = true){
+    // 
+    //     ResultData res = evaluateSolution(problemData_, solution, targetCriterion, forceLogging, abortOnInvalidity, &distanceMatrix_);
+    //     return res;//evaluateSolution(problemData_, solution, targetCriterion, forceLogging, abortOnInvalidity, &distanceMatrix_);
+    // }
 };
 
 
@@ -456,7 +658,11 @@ void callGraspSrImprover(const Rcpp::DataFrame& nodeDf,
                          std::string pathToInitialSolution,
                          std::string fileSuffix = "",
                          std::string pathToChanges = "",
-                         std::string pathToDistanceMatrix =""){
+                         std::string pathToDistanceMatrix ="",
+                         int budgetChangeHandlingMode = 0,
+                         int minBudgetToHandle = 0,
+                         int maxBudgetToHandle = 0,
+                         int budgetChangeTableSize = 0){
 
     MyGraph graph;
     MyGraph::ArcMap<ArcData> arcMap(graph);
@@ -488,6 +694,12 @@ void callGraspSrImprover(const Rcpp::DataFrame& nodeDf,
 
     Rcpp::Environment myEnvironment(MYPACKAGE);
     GraspSrSolver gsrs(pd, problemName, runNumber, myEnvironment, "value", fileSuffix, pathToDistanceMatrix);
+    
+    gsrs.typeOfHandling_ = budgetChangeHandlingMode;
+    if (budgetChangeHandlingMode == Solver::HANDLING_TABLE) {
+        gsrs.initializeSampledTable(minBudgetToHandle, maxBudgetToHandle, 
+                                   budgetChangeTableSize);
+    }
     gsrs.calledAsImprover_ = true;
     gsrs.readInitialSolutionFromFile(pathToInitialSolution);
     // waitForInput("beforeRun", DEBUG_ENABLED);

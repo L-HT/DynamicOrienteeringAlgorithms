@@ -92,7 +92,10 @@ struct ResultData{
         return (value_ > b.value_) || ((value_ == b.value_) && (length_ < b.length_));
     }
 };
-
+struct EvaluatedSolution {
+    std::vector<MyGraph::Node> solution_;
+    ResultData resultData_;
+};
 ResultData getAndLogSolutionQuality(ProblemData& problemData,
                              const std::vector<MyGraph::Node>& solution,
                              std::string targetCriterion,

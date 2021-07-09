@@ -100,8 +100,8 @@ struct Ea4OpSolver : public Solver{
     std::vector<MyGraph::Node> currentSolution_;
 
     // a second "best" solution which is needed in the algorithm but works differently from the best solution defined by Solver
-    std::vector<MyGraph::Node> tempBestSolution_;
-    ResultData tempBestSolutionRes_;
+    // std::vector<MyGraph::Node> tempBestSolution_;
+    // ResultData tempBestSolutionRes_;
 
     std::vector<std::vector<MyGraph::Node>> population_;
     std::vector<ResultData> populationQualities_;
@@ -109,7 +109,7 @@ struct Ea4OpSolver : public Solver{
     std::size_t npop_;
     std::size_t ncand_;
     double p_;
-    double mutationProbability_;
+    double mutationProbability_; // pmut in the paper
     int d2d_;
     double dominanceOfInitialSolution_;
 
@@ -121,7 +121,7 @@ struct Ea4OpSolver : public Solver{
 
     int worstSolutionIndex_;
     ResultData worstSolutionRes_;
-    ResultData currentSolutionRes_;
+    // ResultData currentSolutionRes_;
 
     Ea4OpSolver(ProblemData& problemData,
                 std::string logFileName, unsigned int runNumber, Rcpp::Environment rEnvironment,
@@ -166,6 +166,7 @@ struct Ea4OpSolver : public Solver{
                 // Rcpp::Rcout << counter++ << " / " << population_.size() << std::endl;
                 // Rcpp::Rcout << "current solution: ";
                 // printNodeIdsOfVector(problemData_, sol);
+                // Rcpp::Rcout << "ti-";
                 waitForInput("tourImprovement", DEBUG_MAIN_ALGORITHM);
                 additionalLogData_.currentPhase_ = 1;
                 tourImprovementOperator(sol);
@@ -177,10 +178,12 @@ struct Ea4OpSolver : public Solver{
                 // Rcpp::Rcout << "start: " << problemData_.nodeMap_[problemData_.startNode_].id_ << std::endl;
                 // Rcpp::Rcout << "destinations: ";
                 // printNodeIdsOfVector(problemData_, problemData_.destinations_);
+                // Rcpp::Rcout << "dro-";
                 waitForInput("drop", DEBUG_MAIN_ALGORITHM);
                 additionalLogData_.currentPhase_ = 2;
                 dropOperator(sol);
                 // printNodeIdsOfVector(problemData_, sol);
+                // Rcpp::Rcout << "ad-";
                 waitForInput("add", DEBUG_MAIN_ALGORITHM);
                 additionalLogData_.currentPhase_ = 3;
                 addOperator(sol);
@@ -197,10 +200,12 @@ struct Ea4OpSolver : public Solver{
                     std::vector<MyGraph::Node> parent1;
                     std::vector<MyGraph::Node> parent2;
 
+                    // Rcpp::Rcout << "sp-";
                     waitForInput("select parents", DEBUG_CROSSOVER);
                     additionalLogData_.currentPhase_ = 4;
                     selectParents(parent1, parent2);
 
+                    // Rcpp::Rcout << "cr-";
                     waitForInput("crossover", DEBUG_CROSSOVER);
                     additionalLogData_.currentPhase_ = 5;
                     std::vector<MyGraph::Node> childSolution = crossoverOperator(parent1, parent2);
@@ -209,6 +214,7 @@ struct Ea4OpSolver : public Solver{
 
                     double r = randomNumber(gen);
                     if (r < mutationProbability_){
+                        Rcpp::Rcout << "mu-";
                         waitForInput("mutate", DEBUG_CROSSOVER);
                         additionalLogData_.currentPhase_ = 6;
                         mutationOperator(childSolution);
@@ -233,12 +239,16 @@ struct Ea4OpSolver : public Solver{
                     int counter = 0;
                     for (std::vector<MyGraph::Node> sol : population_){
                         // Rcpp::Rcout << "internal loop: " << counter++ << " / " << population_.size() << std::endl;
+                        // Rcpp::Rcout << "ti-";
                         waitForInput("tourImprovement", DEBUG_MAIN_ALGORITHM);
                         additionalLogData_.currentPhase_ = 11;
                         tourImprovementOperator(sol);
+                        
+                        // Rcpp::Rcout << "dro-";
                         waitForInput("drop", DEBUG_MAIN_ALGORITHM);
                         additionalLogData_.currentPhase_ = 12;
                         dropOperator(sol);
+                        // Rcpp::Rcout << "ad-";
                         waitForInput("add", DEBUG_MAIN_ALGORITHM);
                         additionalLogData_.currentPhase_ = 13;
                         addOperator(sol);
@@ -303,14 +313,14 @@ struct Ea4OpSolver : public Solver{
 
             Rcpp::Rcout << "Population loop" << std::endl;
             for (std::vector<MyGraph::Node> sol : population_){
-
+                // Rcpp::Rcout << "ti-";
                 waitForInput("tourImprovement", DEBUG_MAIN_ALGORITHM);
                 additionalLogData_.currentPhase_ = 1;
                 tourImprovementOperator(sol);
 
                 // Rcpp::Rcout << "DE1: " << additionalLogData_.numberOfShortestPathCalls_ << ", best1: " << bestSolutionQuality_.value_ << "\n";
                 // evaluateSolutionMatrix(problemData_, sol, "value", true);
-
+                // Rcpp::Rcout << "dro-";
                 waitForInput("drop", DEBUG_MAIN_ALGORITHM);
                 additionalLogData_.currentPhase_ = 2;
                 dropOperator(sol);
@@ -319,6 +329,7 @@ struct Ea4OpSolver : public Solver{
                 // Rcpp::Rcout << "DE2: " << additionalLogData_.numberOfShortestPathCalls_ << ", best2: " << bestSolutionQuality_.value_ << "\n";
                 // Rcpp::stop("myEnd");
 
+                // Rcpp::Rcout << "ad-";
                 waitForInput("add", DEBUG_MAIN_ALGORITHM);
                 additionalLogData_.currentPhase_ = 3;
                 addOperator(sol);
@@ -339,12 +350,12 @@ struct Ea4OpSolver : public Solver{
                     std::vector<MyGraph::Node> parent1;
                     std::vector<MyGraph::Node> parent2;
 
-                    Rcpp::Rcout << "sp-";
+                    // Rcpp::Rcout << "sp-";
                     waitForInput("select parents", DEBUG_CROSSOVER);
                     additionalLogData_.currentPhase_ = 4;
                     selectParents(parent1, parent2);
 
-                    Rcpp::Rcout << "cr-";
+                    // Rcpp::Rcout << "cr-";
                     waitForInput("crossover", DEBUG_CROSSOVER);
                     additionalLogData_.currentPhase_ = 5;
                     std::vector<MyGraph::Node> childSolution = crossoverOperator(parent1, parent2);
@@ -382,18 +393,17 @@ struct Ea4OpSolver : public Solver{
                     for (std::vector<MyGraph::Node> sol : population_){
                         //Rcpp::Rcout << "internal loop: " << counter++ << " / " << population_.size() << std::endl;
 
-
-                        Rcpp::Rcout << "ti-";
+                        // Rcpp::Rcout << "ti-";
                         waitForInput("tourImprovement", DEBUG_MAIN_ALGORITHM);
                         additionalLogData_.currentPhase_ = 11;
                         tourImprovementOperator(sol);
 
-                        Rcpp::Rcout << "dro-";
+                        // Rcpp::Rcout << "dro-";
                         waitForInput("drop", DEBUG_MAIN_ALGORITHM);
                         additionalLogData_.currentPhase_ = 12;
                         dropOperator(sol);
 
-                        Rcpp::Rcout << "ad-";
+                        // Rcpp::Rcout << "ad-";
                         waitForInput("add", DEBUG_MAIN_ALGORITHM);
                         additionalLogData_.currentPhase_ = 13;
                         addOperator(sol);
@@ -1167,19 +1177,38 @@ struct Ea4OpSolver : public Solver{
     void greedyAddNode(std::vector<MyGraph::Node>& solution){
         std::vector<MyGraph::Node> tempBestSolution;
         double bestValue = 0;
-        Rcpp::Rcout << "greedyAddNode was called because addOperator started with empty vector!" << std::endl;
+        Rcpp::Rcout << "Info: greedyAddNode was called because addOperator started with empty vector!" << std::endl;
 
-        for (MyGraph::Node n : problemData_.destinations_) {
-
-            solution.clear();
-            solution.push_back(n);
-            ResultData res = evaluateSolutionMatrix(problemData_, solution, "value");
-            if (res.length_ <= problemData_.budget_){
-                if (res.value_ / (2*res.length_) > bestValue) {
-                    tempBestSolution.assign(solution.begin(), solution.end());
-                    bestValue = res.value_;
+        /*
+         * this do-while loop is necessary for the case where no valid solution exists
+         * where the for-loop would end with tempBestSolution being empty (which is not compatible
+         * with the add-operator that follows afterwards).
+         * In this case the search has to be repeated until at least 1 valid node is found 
+         * or until the termination criterion is satisfied. In the latter case, it is likely that
+         * no valid solution exists.
+         */
+        do{
+            for (MyGraph::Node n : problemData_.destinations_) {
+                solution.clear();
+                solution.push_back(n);
+                additionalLogData_.numberOfTestedBitVectors_++;
+                ResultData res = evaluateSolutionMatrix(problemData_, solution, "value");
+                if (res.length_ <= problemData_.budget_){
+                    if (res.value_ / (2*res.length_) > bestValue) {
+                        tempBestSolution.assign(solution.begin(), solution.end());
+                        bestValue = res.value_;
+                    }
                 }
             }
+        } while (tempBestSolution.empty() && !terminationCriterionSatisfied());
+        
+        if (tempBestSolution.empty()){
+            Rcpp::Rcout << "Final budget: " << problemData_.budget_ << "\n";
+            Rcpp::Rcout << additionalLogData_ << "\n";
+            Rcpp::stop("Termination criterion satisfied, but no valid solution was found with greedyAddNode() and addOperator(). It is possible that no valid solution exists.");
+        } else {
+            
+            // Rcpp::Rcout << "tempBestSolution: " << evaluateSolutionMatrix(problemData_, tempBestSolution) << "\n";
         }
         solution.assign(tempBestSolution.begin(), tempBestSolution.end());
     }
@@ -1739,6 +1768,25 @@ struct Ea4OpSolver : public Solver{
                     minIndex = i;
                 }
             }
+            
+            if (minIndex == -1) {
+                /* 
+                 * This (rare) case occurs when for each nodes in the solution no decrease
+                 * in path length occurs when it is removed.
+                 * In this case: Remove a random node. It is possible that the path
+                 * length decreases in the subsequent removals.
+                 */
+                Rcpp::Rcout << "Info: minIndex=-1 in dropOperator. Remove a different node...\n";
+                printNodeIdsOfVector(problemData_, solution);
+                Rcpp::Rcout << evaluateSolutionMatrix(problemData_, solution) << "\n";
+                Rcpp::Rcout << "solutionSize: " << solution.size() << "\n";
+                Rcpp::Rcout << "dropValues.size: " << dropValues.size() << "\n";
+                for (int i = 0; i < (int) dropValues.size(); i++){
+                    Rcpp::Rcout << dropValues[i] << " / " << minDrop << "\n";
+                }
+                minIndex = getRandomNumber(0, dropValues.size()-1);
+                // Rcpp::stop("minIndex ist -1???");
+            }
             solution.erase(solution.begin() + minIndex);
 
             currentLength = evaluateSolutionMatrix(problemData_, solution).length_;
@@ -1747,19 +1795,43 @@ struct Ea4OpSolver : public Solver{
         // waitForInput("DE-output", true);
     }
 
-    double getAndLogDistance(int i, int j){
-        additionalLogData_.numberOfShortestPathCalls_++;
-        //Rcpp::Rcout << "(i,j): " << i << ", " << j << " - " << distanceMatrix_(i,j) << std::endl;
-        return distanceMatrix_(i,j);
+    void resetSolver() override{
+        if (initialSolutionBackup_.empty()) {
+            initialSolutionBackup_.assign(initialSolution_.begin(), initialSolution_.end());
+            initialSolutionQuality_ =  evaluateSolutionMatrix(problemData_, initialSolutionBackup_);
+        }
+        if (initialSolutionQuality_.length_ > problemData_.budget_){
+            initialSolution_.clear();
+            bestSolution_.clear();
+            bestSolutionQuality_ = ResultData(0,0);
+            Rcpp::Rcout << "Restart algorithm with empty initial solution.\n";
+        } else {
+            initialSolution_.assign(initialSolutionBackup_.begin(), initialSolutionBackup_.end());
+            bestSolution_.assign(initialSolution_.begin(), initialSolution_.end());
+            bestSolutionQuality_ = initialSolutionQuality_;
+            Rcpp::Rcout << "Restart algorithm with the given initial solution.\n";
+        }
+        Rcpp::Rcout << "Current log data: " << additionalLogData_ << "\n";
+        run(); 
+        
+        std::vector<MyGraph::Node> mySolution = asCompleteSolution(bestSolution_);
+        writeSolution(mySolution, !calledAsImprover_);
+        Rcpp::Rcout << "Log data at the end:" << additionalLogData_ << "\n";
+        Rcpp::stop("Algorithm used restarts, but the termination criterion is now satisfied");
     }
+    // double getAndLogDistance(int i, int j){
+    //     additionalLogData_.numberOfShortestPathCalls_++;
+    //     //Rcpp::Rcout << "(i,j): " << i << ", " << j << " - " << distanceMatrix_(i,j) << std::endl;
+    //     return distanceMatrix_(i,j);
+    // }
 
-    ResultData evaluateSolutionMatrix(ProblemData& problemData,
-                                      const std::vector<MyGraph::Node>& solution,
-                                      std::string targetCriterion = "value",
-                                      bool forceLogging = false,
-                                      bool abortOnInvalidity = true){
-        return evaluateSolution(problemData_, solution, targetCriterion, forceLogging, abortOnInvalidity, &distanceMatrix_);
-    }
+    // ResultData evaluateSolutionMatrix(ProblemData& problemData,
+    //                                   const std::vector<MyGraph::Node>& solution,
+    //                                   std::string targetCriterion = "value",
+    //                                   bool forceLogging = false,
+    //                                   bool abortOnInvalidity = true){
+    //     return evaluateSolution(problemData_, solution, targetCriterion, forceLogging, abortOnInvalidity, &distanceMatrix_);
+    // }
 
 };
 
@@ -1839,7 +1911,11 @@ void callEa4OpImprover(const Rcpp::DataFrame& nodeDf,
                        double dominanceOfInitialSolution = 0.5,
                        std::string fileSuffix = "",
                        std::string pathToChanges = "",
-                       std::string pathToDistanceMatrix = ""){
+                       std::string pathToDistanceMatrix = "",
+                       int budgetChangeHandlingMode = 0,
+                       int minBudgetToHandle = 0,
+                       int maxBudgetToHandle = 0,
+                       int budgetChangeTableSize = 0){
 
     MyGraph graph;
     MyGraph::ArcMap<ArcData> arcMap(graph);
@@ -1875,6 +1951,12 @@ void callEa4OpImprover(const Rcpp::DataFrame& nodeDf,
     Rcpp::Environment myEnvironment(MYPACKAGE);
     Ea4OpSolver ea(pd, problemName, runNumber, myEnvironment, "value", fileSuffix, pathToDistanceMatrix);
 
+    ea.typeOfHandling_ = budgetChangeHandlingMode;
+    if (budgetChangeHandlingMode == Solver::HANDLING_TABLE) {
+        ea.initializeSampledTable(minBudgetToHandle, maxBudgetToHandle, 
+                                   budgetChangeTableSize);
+    }
+    
     ea.readInitialSolutionFromFile(pathToInitialSolution);
     ea.calledAsImprover_ = true;
     // waitForInput("beforeRun", DEBUG_ENABLED);

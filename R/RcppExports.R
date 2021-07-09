@@ -22,8 +22,8 @@ callEa4OpSolver <- function(nodeDf, arcDf, problemDf, budget, problemName, runNu
 }
 
 #' @export
-callEa4OpImprover <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, dominanceOfInitialSolution = 0.5, fileSuffix = "", pathToChanges = "", pathToDistanceMatrix = "") {
-    invisible(.Call('_DynamicOrienteeringAlgorithms_callEa4OpImprover', PACKAGE = 'DynamicOrienteeringAlgorithms', nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, dominanceOfInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix))
+callEa4OpImprover <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, dominanceOfInitialSolution = 0.5, fileSuffix = "", pathToChanges = "", pathToDistanceMatrix = "", budgetChangeHandlingMode = 0L, minBudgetToHandle = 0L, maxBudgetToHandle = 0L, budgetChangeTableSize = 0L) {
+    invisible(.Call('_DynamicOrienteeringAlgorithms_callEa4OpImprover', PACKAGE = 'DynamicOrienteeringAlgorithms', nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, dominanceOfInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix, budgetChangeHandlingMode, minBudgetToHandle, maxBudgetToHandle, budgetChangeTableSize))
 }
 
 #' @export
@@ -37,8 +37,8 @@ callGraspSrSolver <- function(nodeDf, arcDf, problemDf, budget, problemName, run
 }
 
 #' @export
-callGraspSrImprover <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix = "", pathToChanges = "", pathToDistanceMatrix = "") {
-    invisible(.Call('_DynamicOrienteeringAlgorithms_callGraspSrImprover', PACKAGE = 'DynamicOrienteeringAlgorithms', nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix))
+callGraspSrImprover <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix = "", pathToChanges = "", pathToDistanceMatrix = "", budgetChangeHandlingMode = 0L, minBudgetToHandle = 0L, maxBudgetToHandle = 0L, budgetChangeTableSize = 0L) {
+    invisible(.Call('_DynamicOrienteeringAlgorithms_callGraspSrImprover', PACKAGE = 'DynamicOrienteeringAlgorithms', nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix, budgetChangeHandlingMode, minBudgetToHandle, maxBudgetToHandle, budgetChangeTableSize))
 }
 
 #' @export
@@ -82,7 +82,7 @@ callVNSSolver <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumb
 }
 
 #' @export
-callVNSImprover <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix = "", pathToChanges = "", pathToDistanceMatrix = "", withLocalSearch = FALSE, withLinKernighan = TRUE, perturbationProbability = 0.15) {
-    invisible(.Call('_DynamicOrienteeringAlgorithms_callVNSImprover', PACKAGE = 'DynamicOrienteeringAlgorithms', nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix, withLocalSearch, withLinKernighan, perturbationProbability))
+callVNSImprover <- function(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix = "", pathToChanges = "", pathToDistanceMatrix = "", withLocalSearch = FALSE, withLinKernighan = TRUE, perturbationProbability = 0.15, budgetChangeHandlingMode = 0L, minBudgetToHandle = 0L, maxBudgetToHandle = 0L, budgetChangeTableSize = 0L) {
+    invisible(.Call('_DynamicOrienteeringAlgorithms_callVNSImprover', PACKAGE = 'DynamicOrienteeringAlgorithms', nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix, withLocalSearch, withLinKernighan, perturbationProbability, budgetChangeHandlingMode, minBudgetToHandle, maxBudgetToHandle, budgetChangeTableSize))
 }
 

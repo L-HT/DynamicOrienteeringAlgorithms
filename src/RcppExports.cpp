@@ -60,8 +60,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // callEa4OpImprover
-void callEa4OpImprover(const Rcpp::DataFrame& nodeDf, const Rcpp::DataFrame& arcDf, const Rcpp::DataFrame& problemDf, double budget, std::string problemName, unsigned int runNumber, std::string pathToInitialSolution, double dominanceOfInitialSolution, std::string fileSuffix, std::string pathToChanges, std::string pathToDistanceMatrix);
-RcppExport SEXP _DynamicOrienteeringAlgorithms_callEa4OpImprover(SEXP nodeDfSEXP, SEXP arcDfSEXP, SEXP problemDfSEXP, SEXP budgetSEXP, SEXP problemNameSEXP, SEXP runNumberSEXP, SEXP pathToInitialSolutionSEXP, SEXP dominanceOfInitialSolutionSEXP, SEXP fileSuffixSEXP, SEXP pathToChangesSEXP, SEXP pathToDistanceMatrixSEXP) {
+void callEa4OpImprover(const Rcpp::DataFrame& nodeDf, const Rcpp::DataFrame& arcDf, const Rcpp::DataFrame& problemDf, double budget, std::string problemName, unsigned int runNumber, std::string pathToInitialSolution, double dominanceOfInitialSolution, std::string fileSuffix, std::string pathToChanges, std::string pathToDistanceMatrix, int budgetChangeHandlingMode, int minBudgetToHandle, int maxBudgetToHandle, int budgetChangeTableSize);
+RcppExport SEXP _DynamicOrienteeringAlgorithms_callEa4OpImprover(SEXP nodeDfSEXP, SEXP arcDfSEXP, SEXP problemDfSEXP, SEXP budgetSEXP, SEXP problemNameSEXP, SEXP runNumberSEXP, SEXP pathToInitialSolutionSEXP, SEXP dominanceOfInitialSolutionSEXP, SEXP fileSuffixSEXP, SEXP pathToChangesSEXP, SEXP pathToDistanceMatrixSEXP, SEXP budgetChangeHandlingModeSEXP, SEXP minBudgetToHandleSEXP, SEXP maxBudgetToHandleSEXP, SEXP budgetChangeTableSizeSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::DataFrame& >::type nodeDf(nodeDfSEXP);
@@ -75,7 +75,11 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type fileSuffix(fileSuffixSEXP);
     Rcpp::traits::input_parameter< std::string >::type pathToChanges(pathToChangesSEXP);
     Rcpp::traits::input_parameter< std::string >::type pathToDistanceMatrix(pathToDistanceMatrixSEXP);
-    callEa4OpImprover(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, dominanceOfInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix);
+    Rcpp::traits::input_parameter< int >::type budgetChangeHandlingMode(budgetChangeHandlingModeSEXP);
+    Rcpp::traits::input_parameter< int >::type minBudgetToHandle(minBudgetToHandleSEXP);
+    Rcpp::traits::input_parameter< int >::type maxBudgetToHandle(maxBudgetToHandleSEXP);
+    Rcpp::traits::input_parameter< int >::type budgetChangeTableSize(budgetChangeTableSizeSEXP);
+    callEa4OpImprover(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, dominanceOfInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix, budgetChangeHandlingMode, minBudgetToHandle, maxBudgetToHandle, budgetChangeTableSize);
     return R_NilValue;
 END_RCPP
 }
@@ -114,8 +118,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // callGraspSrImprover
-void callGraspSrImprover(const Rcpp::DataFrame& nodeDf, const Rcpp::DataFrame& arcDf, const Rcpp::DataFrame& problemDf, double budget, std::string problemName, unsigned int runNumber, std::string pathToInitialSolution, std::string fileSuffix, std::string pathToChanges, std::string pathToDistanceMatrix);
-RcppExport SEXP _DynamicOrienteeringAlgorithms_callGraspSrImprover(SEXP nodeDfSEXP, SEXP arcDfSEXP, SEXP problemDfSEXP, SEXP budgetSEXP, SEXP problemNameSEXP, SEXP runNumberSEXP, SEXP pathToInitialSolutionSEXP, SEXP fileSuffixSEXP, SEXP pathToChangesSEXP, SEXP pathToDistanceMatrixSEXP) {
+void callGraspSrImprover(const Rcpp::DataFrame& nodeDf, const Rcpp::DataFrame& arcDf, const Rcpp::DataFrame& problemDf, double budget, std::string problemName, unsigned int runNumber, std::string pathToInitialSolution, std::string fileSuffix, std::string pathToChanges, std::string pathToDistanceMatrix, int budgetChangeHandlingMode, int minBudgetToHandle, int maxBudgetToHandle, int budgetChangeTableSize);
+RcppExport SEXP _DynamicOrienteeringAlgorithms_callGraspSrImprover(SEXP nodeDfSEXP, SEXP arcDfSEXP, SEXP problemDfSEXP, SEXP budgetSEXP, SEXP problemNameSEXP, SEXP runNumberSEXP, SEXP pathToInitialSolutionSEXP, SEXP fileSuffixSEXP, SEXP pathToChangesSEXP, SEXP pathToDistanceMatrixSEXP, SEXP budgetChangeHandlingModeSEXP, SEXP minBudgetToHandleSEXP, SEXP maxBudgetToHandleSEXP, SEXP budgetChangeTableSizeSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::DataFrame& >::type nodeDf(nodeDfSEXP);
@@ -128,7 +132,11 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type fileSuffix(fileSuffixSEXP);
     Rcpp::traits::input_parameter< std::string >::type pathToChanges(pathToChangesSEXP);
     Rcpp::traits::input_parameter< std::string >::type pathToDistanceMatrix(pathToDistanceMatrixSEXP);
-    callGraspSrImprover(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix);
+    Rcpp::traits::input_parameter< int >::type budgetChangeHandlingMode(budgetChangeHandlingModeSEXP);
+    Rcpp::traits::input_parameter< int >::type minBudgetToHandle(minBudgetToHandleSEXP);
+    Rcpp::traits::input_parameter< int >::type maxBudgetToHandle(maxBudgetToHandleSEXP);
+    Rcpp::traits::input_parameter< int >::type budgetChangeTableSize(budgetChangeTableSizeSEXP);
+    callGraspSrImprover(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix, budgetChangeHandlingMode, minBudgetToHandle, maxBudgetToHandle, budgetChangeTableSize);
     return R_NilValue;
 END_RCPP
 }
@@ -255,8 +263,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // callVNSImprover
-void callVNSImprover(const Rcpp::DataFrame& nodeDf, const Rcpp::DataFrame& arcDf, const Rcpp::DataFrame& problemDf, double budget, std::string problemName, unsigned int runNumber, std::string pathToInitialSolution, std::string fileSuffix, std::string pathToChanges, std::string pathToDistanceMatrix, bool withLocalSearch, bool withLinKernighan, double perturbationProbability);
-RcppExport SEXP _DynamicOrienteeringAlgorithms_callVNSImprover(SEXP nodeDfSEXP, SEXP arcDfSEXP, SEXP problemDfSEXP, SEXP budgetSEXP, SEXP problemNameSEXP, SEXP runNumberSEXP, SEXP pathToInitialSolutionSEXP, SEXP fileSuffixSEXP, SEXP pathToChangesSEXP, SEXP pathToDistanceMatrixSEXP, SEXP withLocalSearchSEXP, SEXP withLinKernighanSEXP, SEXP perturbationProbabilitySEXP) {
+void callVNSImprover(const Rcpp::DataFrame& nodeDf, const Rcpp::DataFrame& arcDf, const Rcpp::DataFrame& problemDf, double budget, std::string problemName, unsigned int runNumber, std::string pathToInitialSolution, std::string fileSuffix, std::string pathToChanges, std::string pathToDistanceMatrix, bool withLocalSearch, bool withLinKernighan, double perturbationProbability, int budgetChangeHandlingMode, int minBudgetToHandle, int maxBudgetToHandle, int budgetChangeTableSize);
+RcppExport SEXP _DynamicOrienteeringAlgorithms_callVNSImprover(SEXP nodeDfSEXP, SEXP arcDfSEXP, SEXP problemDfSEXP, SEXP budgetSEXP, SEXP problemNameSEXP, SEXP runNumberSEXP, SEXP pathToInitialSolutionSEXP, SEXP fileSuffixSEXP, SEXP pathToChangesSEXP, SEXP pathToDistanceMatrixSEXP, SEXP withLocalSearchSEXP, SEXP withLinKernighanSEXP, SEXP perturbationProbabilitySEXP, SEXP budgetChangeHandlingModeSEXP, SEXP minBudgetToHandleSEXP, SEXP maxBudgetToHandleSEXP, SEXP budgetChangeTableSizeSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::DataFrame& >::type nodeDf(nodeDfSEXP);
@@ -272,7 +280,11 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type withLocalSearch(withLocalSearchSEXP);
     Rcpp::traits::input_parameter< bool >::type withLinKernighan(withLinKernighanSEXP);
     Rcpp::traits::input_parameter< double >::type perturbationProbability(perturbationProbabilitySEXP);
-    callVNSImprover(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix, withLocalSearch, withLinKernighan, perturbationProbability);
+    Rcpp::traits::input_parameter< int >::type budgetChangeHandlingMode(budgetChangeHandlingModeSEXP);
+    Rcpp::traits::input_parameter< int >::type minBudgetToHandle(minBudgetToHandleSEXP);
+    Rcpp::traits::input_parameter< int >::type maxBudgetToHandle(maxBudgetToHandleSEXP);
+    Rcpp::traits::input_parameter< int >::type budgetChangeTableSize(budgetChangeTableSizeSEXP);
+    callVNSImprover(nodeDf, arcDf, problemDf, budget, problemName, runNumber, pathToInitialSolution, fileSuffix, pathToChanges, pathToDistanceMatrix, withLocalSearch, withLinKernighan, perturbationProbability, budgetChangeHandlingMode, minBudgetToHandle, maxBudgetToHandle, budgetChangeTableSize);
     return R_NilValue;
 END_RCPP
 }
@@ -282,10 +294,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DynamicOrienteeringAlgorithms_exportToDistanceMatrix", (DL_FUNC) &_DynamicOrienteeringAlgorithms_exportToDistanceMatrix, 5},
     {"_DynamicOrienteeringAlgorithms_readDistanceMatrix", (DL_FUNC) &_DynamicOrienteeringAlgorithms_readDistanceMatrix, 1},
     {"_DynamicOrienteeringAlgorithms_callEa4OpSolver", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callEa4OpSolver, 9},
-    {"_DynamicOrienteeringAlgorithms_callEa4OpImprover", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callEa4OpImprover, 11},
+    {"_DynamicOrienteeringAlgorithms_callEa4OpImprover", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callEa4OpImprover, 15},
     {"_DynamicOrienteeringAlgorithms_callEvaluator", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callEvaluator, 6},
     {"_DynamicOrienteeringAlgorithms_callGraspSrSolver", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callGraspSrSolver, 9},
-    {"_DynamicOrienteeringAlgorithms_callGraspSrImprover", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callGraspSrImprover, 10},
+    {"_DynamicOrienteeringAlgorithms_callGraspSrImprover", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callGraspSrImprover, 14},
     {"_DynamicOrienteeringAlgorithms_convertLGFtoR", (DL_FUNC) &_DynamicOrienteeringAlgorithms_convertLGFtoR, 1},
     {"_DynamicOrienteeringAlgorithms_saveDigraphAsLGF", (DL_FUNC) &_DynamicOrienteeringAlgorithms_saveDigraphAsLGF, 3},
     {"_DynamicOrienteeringAlgorithms_saveDigraphWithProblemDataAsLGF", (DL_FUNC) &_DynamicOrienteeringAlgorithms_saveDigraphWithProblemDataAsLGF, 5},
@@ -294,7 +306,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DynamicOrienteeringAlgorithms_callRandomSolver", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callRandomSolver, 8},
     {"_DynamicOrienteeringAlgorithms_callRandomImprover", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callRandomImprover, 9},
     {"_DynamicOrienteeringAlgorithms_callVNSSolver", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callVNSSolver, 12},
-    {"_DynamicOrienteeringAlgorithms_callVNSImprover", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callVNSImprover, 13},
+    {"_DynamicOrienteeringAlgorithms_callVNSImprover", (DL_FUNC) &_DynamicOrienteeringAlgorithms_callVNSImprover, 17},
     {NULL, NULL, 0}
 };
 

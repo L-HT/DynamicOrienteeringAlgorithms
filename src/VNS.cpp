@@ -14,6 +14,7 @@
 #include "IDSearchFunctions.h"
 #include "DistanceMatrix.h"
 #include "linkern_wrapper.h"
+#include "BudgetChangeHandling.h"
 
 #define CRITERION_RATIO 1
 #define CRITERION_LENGTH 2
@@ -105,9 +106,9 @@ struct VariableNeighborhoodSearch : public Solver{
 
         std::string operationSequence_ = "213";
 
-        if (initialSolution_.empty() && calledAsImprover_){
-            Rcpp::stop("Initial solution is missing");
-        }
+        // if (initialSolution_.empty() && calledAsImprover_){
+        //     Rcpp::stop("Initial solution is missing");
+        // }
 
         bestSolution_.assign(initialSolution_.begin(), initialSolution_.end());
         bestSolutionQuality_ = evaluateSolutionMatrix(problemData_, bestSolution_, "value", true);
@@ -327,43 +328,12 @@ struct VariableNeighborhoodSearch : public Solver{
                     std::size_t tempBestPosition = 0;
 
                     for (std::size_t i = 0; i < numberOfPossibleInsertionPositions; i++){
-                        // tempSolution.assign(mySolution.begin(), mySolution.end());
-                        //
-                        // if (i == numberOfPossibleInsertionPositions - 1){
-                        //     tempSolution.push_back(n);
-                        // } else {
-                        //     tempSolution.insert(tempSolution.begin() + i, n);
-                        // }
-
-                        // printNodeIdsOfVector(problemData_, tempSolution);
-
-
+                        
                         /*
                          * estimate increase in path length instead of fully evaluating a solution
                          */
                         ResultData res;
                         double pathLengthDifference = 0.0;
-                        // if ((numberOfPossibleInsertionPositions - i < 3 || i < 3) && i > 0 && i < numberOfPossibleInsertionPositions) {
-                        //     Rcpp::Rcout << "i/number: " << i << "/" << numberOfPossibleInsertionPositions << ", destIndex: " << destinationIndex << "\n";
-                        //     Rcpp::Rcout << "solutionIndices[i-1]:  " << solutionIndices[i-1] << ", solutionIndices[i]: " << solutionIndices[i] << "\n";
-                        // }
-                        // if (i == numberOfPossibleInsertionPositions - 1) {
-                        //     pathLengthDifference += getAndLogDistance(solutionIndices[i-1], destinationIndex+1)
-                        //                             +getAndLogDistance(destinationIndex+1, 0)
-                        //                             -getAndLogDistance(solutionIndices[i-1], 0);
-                        // } else {
-                        //     if (i == 0) {
-                        //         pathLengthDifference += getAndLogDistance(destinationIndex+1, solutionIndices[i])
-                        //         +getAndLogDistance(0, destinationIndex+1)
-                        //         -getAndLogDistance(0, solutionIndices[i]);
-                        //     } else {
-                        //         pathLengthDifference += getAndLogDistance(solutionIndices[i-1], destinationIndex+1)
-                        //                                 +getAndLogDistance(destinationIndex+1, solutionIndices[i])
-                        //                                 -getAndLogDistance(solutionIndices[i-1], solutionIndices[i]);
-                        //     }
-                        // }
-                        // res.length_ = currentSolutionQuality_.length_ + pathLengthDifference;
-                        // res.value_ = currentSolutionQuality_.value_ + problemData_.nodeMap_[n].value_;
 
                         switch(insertCriterion) {
                         case(CRITERION_RATIO):
@@ -498,26 +468,7 @@ struct VariableNeighborhoodSearch : public Solver{
                 case(CRITERION_RATIO):
                     {
                         // res = evaluateSolutionMatrix(problemData_, tempSolution);
-                        res = estimatePathLengthDecrease(solutionIndices, i, mySolution);
-                        // { // for Debug purposes -- should be deleted
-                        //     std::vector<MyGraph::Node> copySolution(mySolution.begin(), mySolution.end());
-                        //     copySolution.erase(copySolution.begin() + i);
-                        //     ResultData copyRes = evaluateSolutionMatrix(problemData_, copySolution);
-                        //
-                        //     double vonHand = currentSolutionQuality_.length_ - copyRes.length_;
-                        //     double vonFormel =  currentSolutionQuality_.length_ - res.length_;
-                        //     if (vonHand != vonFormel) {
-                        //         Rcpp::Rcout << "i: " << i << "/" << mySolution.size() << " - " << vonHand << " / " << vonFormel << "\n";
-                        //
-                        //         // printNodeIdsOfVector(problemData_, mySolution);
-                        //         // printNodeIdsOfVector(problemData_, copySolution);
-                        //
-                        //         Rcpp::Rcout << "old / new: " << currentSolutionQuality_ << " / " << copyRes << "\n";
-                        //         Rcpp::Rcout << "Formel: " << getAndLogDistance(solutionIndices[i], solutionIndices[i+1]) << " + " <<
-                        //             getAndLogDistance(solutionIndices[i-1], solutionIndices[i]) << " - " << getAndLogDistance(solutionIndices[i-1], solutionIndices[i+1]) << "\n";
-                        //         Rcpp::stop("wtd");
-                        //     }
-                        // }
+                        res = estimatePathLengthDecrease(solutionIndices, i, mySolution, currentSolutionQuality_);
                         if (res.length_ - currentSolutionQuality_.length_ != 0) {
                             removeValue =  problemData_.nodeMap_[mySolution[i]].value_/(currentSolutionQuality_.length_ - res.length_);
                         } else {
@@ -528,7 +479,7 @@ struct VariableNeighborhoodSearch : public Solver{
                     break;
                 case(CRITERION_LENGTH):
                     // res = evaluateSolutionMatrix(problemData_, tempSolution);
-                    res = estimatePathLengthDecrease(solutionIndices, i, mySolution);
+                    res = estimatePathLengthDecrease(solutionIndices, i, mySolution, currentSolutionQuality_);
                     if (res.length_ - currentSolutionQuality_.length_ != 0) {
                         removeValue =  1/(currentSolutionQuality_.length_ - res.length_);
                     } else {
@@ -537,7 +488,7 @@ struct VariableNeighborhoodSearch : public Solver{
                     break;
                 case(CRITERION_VALUE):
                     // res = evaluateSolutionMatrix(problemData_, tempSolution);
-                    res = estimatePathLengthDecrease(solutionIndices, i, mySolution);
+                    res = estimatePathLengthDecrease(solutionIndices, i, mySolution, currentSolutionQuality_);
                     removeValue =  problemData_.nodeMap_[mySolution[i]].value_;
                     break;
                 case(CRITERION_RANDOM):
@@ -546,7 +497,7 @@ struct VariableNeighborhoodSearch : public Solver{
                 default:
                     Rcpp::Rcerr << "invalid remove criterion number " << removeCriterion << ". Use CRITERION_RATIO.\n";
                     // res = evaluateSolutionMatrix(problemData_, tempSolution);
-                    res = estimatePathLengthDecrease(solutionIndices, i, mySolution);
+                    res = estimatePathLengthDecrease(solutionIndices, i, mySolution, currentSolutionQuality_);
                     if (res.length_ - currentSolutionQuality_.length_ != 0) {
                         removeValue =  problemData_.nodeMap_[mySolution[i]].value_/(currentSolutionQuality_.length_ - res.length_);
                     } else {
@@ -570,40 +521,40 @@ struct VariableNeighborhoodSearch : public Solver{
         } while (currentSolutionQuality_.length_ > problemData_.budget_);
     }
 
-    ResultData estimatePathLengthDecrease(const std::vector<int>& solutionIndices, int i, const std::vector<MyGraph::Node>& tempSolution) {
-        ResultData res;
-        double pathLengthDecrease = 0.0;
-
-        if (i == solutionIndices.size() - 1) {
-            if (solutionIndices.size() == 1) {
-                // edge case
-                pathLengthDecrease += getAndLogDistance(solutionIndices[i], 0)
-                    +getAndLogDistance(0, solutionIndices[i]);
-            } else {
-                pathLengthDecrease += getAndLogDistance(solutionIndices[i], 0)
-                +getAndLogDistance(solutionIndices[i-1], solutionIndices[i])
-                -getAndLogDistance(solutionIndices[i-1], 0);
-            }
-        } else {
-            if (i == 0) {
-                pathLengthDecrease += getAndLogDistance(0, solutionIndices[0])
-                +getAndLogDistance(solutionIndices[0], solutionIndices[1])
-                -getAndLogDistance(0, solutionIndices[1]);
-            } else {
-                pathLengthDecrease += getAndLogDistance(solutionIndices[i], solutionIndices[i+1])
-                +getAndLogDistance(solutionIndices[i-1], solutionIndices[i])
-                -getAndLogDistance(solutionIndices[i-1], solutionIndices[i+1]);
-            }
-        }
-
-        int prev = (i==0) ? 0 : solutionIndices[i-1];
-        int curr = solutionIndices[i];
-        int next = (i == (int) solutionIndices.size()-1) ? 0 : solutionIndices[i+1];
-
-        res.length_ = currentSolutionQuality_.length_ - pathLengthDecrease;
-        res.value_ = currentSolutionQuality_.value_ - problemData_.nodeMap_[tempSolution[i]].value_;
-        return res;
-    }
+    // ResultData estimatePathLengthDecrease(const std::vector<int>& solutionIndices, int i, const std::vector<MyGraph::Node>& tempSolution) {
+    //     ResultData res;
+    //     double pathLengthDecrease = 0.0;
+    // 
+    //     if (i == solutionIndices.size() - 1) {
+    //         if (solutionIndices.size() == 1) {
+    //             // edge case
+    //             pathLengthDecrease += getAndLogDistance(solutionIndices[i], 0)
+    //                 +getAndLogDistance(0, solutionIndices[i]);
+    //         } else {
+    //             pathLengthDecrease += getAndLogDistance(solutionIndices[i], 0)
+    //             +getAndLogDistance(solutionIndices[i-1], solutionIndices[i])
+    //             -getAndLogDistance(solutionIndices[i-1], 0);
+    //         }
+    //     } else {
+    //         if (i == 0) {
+    //             pathLengthDecrease += getAndLogDistance(0, solutionIndices[0])
+    //             +getAndLogDistance(solutionIndices[0], solutionIndices[1])
+    //             -getAndLogDistance(0, solutionIndices[1]);
+    //         } else {
+    //             pathLengthDecrease += getAndLogDistance(solutionIndices[i], solutionIndices[i+1])
+    //             +getAndLogDistance(solutionIndices[i-1], solutionIndices[i])
+    //             -getAndLogDistance(solutionIndices[i-1], solutionIndices[i+1]);
+    //         }
+    //     }
+    // 
+    //     int prev = (i==0) ? 0 : solutionIndices[i-1];
+    //     int curr = solutionIndices[i];
+    //     int next = (i == (int) solutionIndices.size()-1) ? 0 : solutionIndices[i+1];
+    // 
+    //     res.length_ = currentSolutionQuality_.length_ - pathLengthDecrease;
+    //     res.value_ = currentSolutionQuality_.value_ - problemData_.nodeMap_[tempSolution[i]].value_;
+    //     return res;
+    // }
 
     bool localSearchByReferencePermutation(std::vector<MyGraph::Node>& permutation, std::string opString){
         std::size_t counter = 0;
@@ -708,17 +659,17 @@ struct VariableNeighborhoodSearch : public Solver{
         return permutationHasImproved;
     }
 
-    ResultData evaluateSolutionMatrix(ProblemData& problemData,
-                                      const std::vector<MyGraph::Node>& solution,
-                                      std::string targetCriterion = "value",
-                                      bool forceLogging = false,
-                                      bool abortOnInvalidity = true){
-        return evaluateSolution(problemData_, solution, targetCriterion, forceLogging, abortOnInvalidity, &distanceMatrix_);
-    }
-    double getAndLogDistance(int i, int j){
-        additionalLogData_.numberOfShortestPathCalls_++;
-        return distanceMatrix_(i,j);
-    }
+    // ResultData evaluateSolutionMatrix(ProblemData& problemData,
+    //                                   const std::vector<MyGraph::Node>& solution,
+    //                                   std::string targetCriterion = "value",
+    //                                   bool forceLogging = false,
+    //                                   bool abortOnInvalidity = true){
+    //     return evaluateSolution(problemData_, solution, targetCriterion, forceLogging, abortOnInvalidity, &distanceMatrix_);
+    // }
+    // double getAndLogDistance(int i, int j){
+    //     additionalLogData_.numberOfShortestPathCalls_++;
+    //     return distanceMatrix_(i,j);
+    // }
 
     void callLinKernighanHeuristic(std::vector<MyGraph::Node>& solution){
         // the paper uses Repeated Lin-Kernighan (Applegate et al., 2003)
@@ -743,13 +694,38 @@ struct VariableNeighborhoodSearch : public Solver{
             tempSolution.push_back(problemData_.startNode_);
             tempSolution.insert(tempSolution.end(), solution.begin(), solution.end());
             tempSolution.push_back(problemData_.startNode_);
+            
+            additionalLogData_.numberOfTestedBitVectors_++;
 
             std::vector<MyGraph::Node> solution2 = callRepeatedLinKernighan(problemData_, tempSolution, distanceMatrix_, *this);
             solution.assign(solution2.begin()+1, solution2.end()-1);
         }
     }
 
-
+    void resetSolver() override{
+        if (initialSolutionBackup_.empty()) {
+            initialSolutionBackup_.assign(initialSolution_.begin(), initialSolution_.end());
+            initialSolutionQuality_ =  evaluateSolutionMatrix(problemData_, initialSolutionBackup_);
+        }
+        if (initialSolutionQuality_.length_ > problemData_.budget_){
+            initialSolution_.clear();
+            bestSolution_.clear();
+            bestSolutionQuality_ = ResultData(0,0);
+            Rcpp::Rcout << "Restart algorithm with empty initial solution.\n";
+        } else {
+            initialSolution_.assign(initialSolutionBackup_.begin(), initialSolutionBackup_.end());
+            bestSolution_.assign(initialSolution_.begin(), initialSolution_.end());
+            bestSolutionQuality_ = initialSolutionQuality_;
+            Rcpp::Rcout << "Restart algorithm with the given initial solution.\n";
+        }
+        
+        run(); 
+        
+        std::vector<MyGraph::Node> mySolution = asCompleteSolution(bestSolution_);
+        writeSolution(mySolution, !calledAsImprover_);
+        Rcpp::Rcout << "Log data at the end: " << additionalLogData_ << "\n";
+        Rcpp::stop("Algorithm used restarts, but the termination criterion is now satisfied");
+    }
 };
 
 //' @export
@@ -823,7 +799,11 @@ void callVNSImprover(const Rcpp::DataFrame& nodeDf,
                            std::string pathToDistanceMatrix = "",
                            bool withLocalSearch = false,
                            bool withLinKernighan = true,
-                           double perturbationProbability = 0.15){
+                           double perturbationProbability = 0.15,
+                           int budgetChangeHandlingMode = 0,
+                           int minBudgetToHandle = 0,
+                           int maxBudgetToHandle = 0,
+                           int budgetChangeTableSize = 0){
 
     MyGraph graph;
     MyGraph::ArcMap<ArcData> arcMap(graph);
@@ -855,6 +835,11 @@ void callVNSImprover(const Rcpp::DataFrame& nodeDf,
     vns.withLinKernighan_ = withLinKernighan;
     // vns.iterationsWithForcedCriterionRatio_ = iterationsWithForcedCriterionRatio;
     vns.perturbationProbability_ = perturbationProbability;
+    vns.typeOfHandling_ = budgetChangeHandlingMode;
+    if (budgetChangeHandlingMode == Solver::HANDLING_TABLE) {
+        vns.initializeSampledTable(minBudgetToHandle, maxBudgetToHandle, 
+                                                       budgetChangeTableSize);
+    }
     vns.calledAsImprover_ = true;
     vns.readInitialSolutionFromFile(pathToInitialSolution);
     vns.run();
