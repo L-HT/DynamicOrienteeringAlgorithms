@@ -46,7 +46,7 @@ Solver::Solver(ProblemData& problemData,
     logFile_.open (ss.str(), std::ios_base::trunc); //app für append
 
     logFile_ << "calculatedPaths,shortestPathCalls,testedBitVectors,iteration,phase,time,pathLength,value" << "\n";
-    Rcpp::Rcout << "Time start -now-!" << std::endl;
+    Rcpp::Rcout << "Time measurement starts -now-!" << std::endl;
     startTime_ = std::chrono::high_resolution_clock::now();
 
     additionalLogData_ = AdditionalLogData();

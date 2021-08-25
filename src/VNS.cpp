@@ -61,7 +61,8 @@ struct VariableNeighborhoodSearch : public Solver{
         std::vector<MyGraph::Node> mySolution;
         bool possibleToAddNode = true;
         additionalLogData_.currentPhase_ = 0;
-
+        printBudgetChangeHandlingInfo();
+        
         /*
         -tourImprov verbessert die Tourlänge
             -drop entfernt den Knoten, der die meiste Entfernung verbraucht
@@ -724,7 +725,7 @@ struct VariableNeighborhoodSearch : public Solver{
         std::vector<MyGraph::Node> mySolution = asCompleteSolution(bestSolution_);
         writeSolution(mySolution, !calledAsImprover_);
         Rcpp::Rcout << "Log data at the end: " << additionalLogData_ << "\n";
-        Rcpp::stop("Algorithm used restarts, but the termination criterion is now satisfied");
+        Rcpp::stop("Algorithm used restarts, but the termination criterion is now satisfied. Algorithm is stopped...");
     }
 };
 

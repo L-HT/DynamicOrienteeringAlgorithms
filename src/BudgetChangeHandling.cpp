@@ -57,6 +57,9 @@ void Solver::initializeSampledTable(int minBudget, int maxBudget, int tableSize)
      * It is also necessary to check whether K is larger than (max-min+1)
      */
     if (tableSize > (maxBudget - minBudget + 1)) {
+        Rcpp::Rcerr << "tableSize has been set to " << maxBudget - minBudget + 1
+                    << " instead of " << tableSize << " since only integer values are supported\n";
+        
         tableSize = maxBudget - minBudget + 1;
     }
     tableSize_ = tableSize;
@@ -66,6 +69,12 @@ void Solver::initializeSampledTable(int minBudget, int maxBudget, int tableSize)
     std::vector<int> samplePoints;
     samplePoints.push_back(minBudget_);
 
+    if (minBudget_ >= maxBudget_) {
+        Rcpp::stop("maxBudget must be strictly larger than minBudget. Abort...");
+    }
+    if (tableSize <= 1) {
+        Rcpp::stop("Table size must be at least 2. Abort...");
+    }
     for (int i = 0; i < tableSize_; i++) {
         double intervalPoint = minBudget + i*(maxBudget-minBudget) / (tableSize - 1);
         int currentBudget = std::floor(intervalPoint);
@@ -215,4 +224,24 @@ ResultData Solver::estimatePathLengthDecrease(const std::vector<int>& solutionIn
 }
 
 
+void Solver::printBudgetChangeHandlingInfo() {
+    
+    if (typeOfHandling_ == HANDLING_NONE) {
+        Rcpp::Rcout << "Budget change handling method: none\n";
+    }
+    if (typeOfHandling_ == HANDLING_RESTART) {
+        Rcpp::Rcout << "Budget change handling method: restart\n";
+    }
+    if (typeOfHandling_ == HANDLING_FIX_SPARINGLY) {
+        Rcpp::Rcout << "Budget change handling method: sparingly (H-value)\n";
+    }
+    if (typeOfHandling_ == HANDLING_FIX_VIOLATION) {
+        Rcpp::Rcout << "Budget change handling method: violation (H-length)\n";
+    }
+    if (typeOfHandling_ == HANDLING_TABLE) {
+        Rcpp::Rcout << "Budget change handling method: Table with (min, max, size) = ("
+                    << minBudget_ << ", " << maxBudget_ << ", " << tableSize_ 
+                    << ")\n";
+    }
+}
 

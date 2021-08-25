@@ -154,7 +154,7 @@ struct Ea4OpSolver : public Solver{
         ResultData allNodesResultData = evaluateSolutionMatrix(problemData_, allNodes);
         p_ = std::sqrt(problemData_.budget_ / allNodesResultData.length_);
         Rcpp::Rcout << "p_ calculated as: " << "sqrt(" << problemData_.budget_ << " / " << allNodesResultData.length_ << ") = " << p_ << "\n";
-
+        printBudgetChangeHandlingInfo();
         if (initialSolution_.empty()){
 
             waitForInput("constructInitialPopulation", DEBUG_MAIN_ALGORITHM);
@@ -1817,7 +1817,7 @@ struct Ea4OpSolver : public Solver{
         std::vector<MyGraph::Node> mySolution = asCompleteSolution(bestSolution_);
         writeSolution(mySolution, !calledAsImprover_);
         Rcpp::Rcout << "Log data at the end:" << additionalLogData_ << "\n";
-        Rcpp::stop("Algorithm used restarts, but the termination criterion is now satisfied");
+        Rcpp::stop("Algorithm used restarts, but the termination criterion is now satisfied. Algorithm is stopped...");
     }
     // double getAndLogDistance(int i, int j){
     //     additionalLogData_.numberOfShortestPathCalls_++;

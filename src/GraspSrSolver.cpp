@@ -50,7 +50,7 @@ struct GraspSrSolver : public Solver{
     void run(){
 
         Rcpp::Rcout << "start " << algorithmName_  <<  std::endl;
-
+        printBudgetChangeHandlingInfo();
         if (initialSolution_.empty() && !calledAsImprover_){
             Rcpp::Rcout << "start " << algorithmName_ << " (Solver)" << std::endl;
             // waitForInput("beforeAddVertex", DEBUG_ENABLED);
@@ -477,7 +477,7 @@ struct GraspSrSolver : public Solver{
         std::vector<MyGraph::Node> mySolution = asCompleteSolution(bestSolution_);
         writeSolution(mySolution, !calledAsImprover_);
         Rcpp::Rcout << "Log data at the end:" << additionalLogData_ << "\n";
-        Rcpp::stop("Algorithm used restarts, but the termination criterion is now satisfied");
+        Rcpp::stop("Algorithm used restarts, but the termination criterion is now satisfied. Algorithm is stopped...");
     }
     
     ResultData evaluateSolution(ProblemData& problemData,

@@ -118,6 +118,7 @@ struct Solver{
                                         const std::vector<MyGraph::Node>& tempSolution,
                                         const ResultData& currentSolutionQuality);
   
+  void printBudgetChangeHandlingInfo();
   virtual void resetSolver();
   
   /////////////////////////////////////////////////
@@ -125,5 +126,7 @@ struct Solver{
   /////////////////////////////////////////////////
 
 };
+
+
 
 #endif
