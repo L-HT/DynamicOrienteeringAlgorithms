@@ -55,12 +55,24 @@ Solver::Solver(ProblemData& problemData,
     // if the variable points to a valid file containing a distance matrix, it is read from that file
     // otherwise (invalid path or "none") nothing happens
     if (pathToDistanceMatrix == "") {
-        Rcpp::Rcout << "distance matrix: calculated\n";
+        
         distanceMatrix_ = calculateDistanceMatrix(problemData_);
+        Rcpp::Rcout << "distance matrix: calculated -- " << distanceMatrix_.nrow() << " rows, " 
+                    << distanceMatrix_.ncol() << " columns\n";
         additionalLogData_.numberOfCalculatedPaths_ += (problemData_.destinations_.size() + 1)*(problemData_.destinations_.size() + 1)/2;
     } else {
-        Rcpp::Rcout << "distance matrix: read\n";
+        
         distanceMatrix_ = readDistanceMatrix(pathToDistanceMatrix);
+        Rcpp::Rcout << "distance matrix: read -- " << distanceMatrix_.nrow() << " rows, " 
+                    << distanceMatrix_.ncol() << " columns\n";
+        if (!distanceMatrixValid(distanceMatrix_)){
+            // Rcpp::Rcout << "Info: Manual distance calculations will be used (since pathToDistanceMatrix was invalid).\n";
+            Rcpp::Rcout << "Info: Distance matrix is recalculated (since pathToDistanceMatrix was invalid).\n";
+            distanceMatrix_ = calculateDistanceMatrix(problemData_);
+            Rcpp::Rcout << "distance matrix: calculated -- " << distanceMatrix_.nrow() << " rows, " 
+                        << distanceMatrix_.ncol() << " columns\n";
+            additionalLogData_.numberOfCalculatedPaths_ += (problemData_.destinations_.size() + 1)*(problemData_.destinations_.size() + 1)/2;
+        }
     }
     // Rcpp::Rcout << "print matrix2 with " << distanceMatrix_.nrow() << " rows and " << distanceMatrix_.ncol() << " columns:" << "\n";
     // for (int i = 0; i < distanceMatrix_.nrow(); i++){
