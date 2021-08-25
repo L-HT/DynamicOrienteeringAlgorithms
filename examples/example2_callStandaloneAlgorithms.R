@@ -20,10 +20,10 @@ callVNSSolver(instanceData$nodeDf,
                   )
 
 # check the folder "output" to see the log data for this run
-# (file "myTestProblem-gsr-1234"'")
+# (file "myTestProblem-vns-1234"'")
 
 # check the folder "initialSolutions" to see the best solution generated during this run
-# (file "myTestProblem_gsr")
+# (file "myTestProblem_vns")
 
 # if you want to plot this solution:
 # read the solution as a long string and split it into an array of numbers

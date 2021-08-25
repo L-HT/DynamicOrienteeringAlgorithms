@@ -5,7 +5,7 @@ library(DynamicOrienteeringAlgorithms)
 library(igraph)
 
 # name of the instance
-instanceName <- "LGF-Leipzig-50-80000-1"
+instanceName <- "LGF-Leipzig-100-80000-1"
 
 # name of initial solution (available: random1, random2, greedy, gsr, ea)
 initialSolutionName <- "random2"

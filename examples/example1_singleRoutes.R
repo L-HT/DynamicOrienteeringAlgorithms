@@ -28,6 +28,3 @@ plotNetworkRoute_R(instanceData$nodeDf, instanceData$arcDf, instanceData$problem
 # feel free to test and plot different routes, for example this one:
 # (only routes between nodes from problemDf are supported, otherwise an error occurs)
 myRoute <- c(6056, 2333, 1835, 3878)
-
-# this function only calculates the length and value of myRoute (without plotting)
-callEvaluator(instanceData$nodeDf, instanceData$arcDf, instanceData$problemDf, 0, myRoute)
