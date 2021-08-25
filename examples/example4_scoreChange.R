@@ -30,7 +30,8 @@ pathToChanges <- paste("./instances_changes_score/", instanceName,"-", changesNa
 # name of the resulting logfile
 problemName <- paste(instanceName, initialSolutionName, changesName, sep="-")
 
-pathToDistanceMatrix <- paste("./distanceMatrices/", instanceName, sep="")
+# pathToDistanceMatrix <- paste("./distanceMatrices/", instanceName, sep="")
+pathToDistanceMatrix <- ""
 
 # call VNS_DOP (improvement heuristic)
 # an optional file suffix can be attached with the fileSuffix argument
@@ -62,7 +63,6 @@ callEa4OpSolver(instanceData$nodeDf, instanceData$arcDf, instanceData$problemDf,
                   budget = instanceData$budget,
                   problemName= problemName,
                   runNumber=2,
-                  pathToInitialSolution = pathToInitialSolution,
                   fileSuffix = "score",
                   pathToChanges = pathToChanges,
                   pathToDistanceMatrix = pathToDistanceMatrix
@@ -73,7 +73,6 @@ callGraspSrSolver(instanceData$nodeDf, instanceData$arcDf, instanceData$problemD
           budget = instanceData$budget,
           problemName= problemName,
           runNumber=1,
-          # pathToInitialSolution = pathToInitialSolution,
           fileSuffix = "score",
           pathToChanges = pathToChanges,
           pathToDistanceMatrix = pathToDistanceMatrix

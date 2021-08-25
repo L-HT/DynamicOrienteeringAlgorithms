@@ -31,6 +31,7 @@ pathToChanges <- paste("./instances_changes_budget/", instanceName,"-", changesN
 problemName <- paste(instanceName, initialSolutionName, changesName, sep="-")
 
 pathToDistanceMatrix <- paste("./distanceMatrices/", instanceName, sep="")
+# pathToDistanceMatrix <- ""
 
 # handlingMode:
 # 0 - no handling
@@ -49,10 +50,7 @@ callVNSImprover(instanceData$nodeDf, instanceData$arcDf, instanceData$problemDf,
                 fileSuffix = "testSuffix",
                 pathToChanges = pathToChanges, 
                 pathToDistanceMatrix = pathToDistanceMatrix,
-                budgetChangeHandlingMode = 1, 
-                minBudgetToHandle = 30000,
-                maxBudgetToHandle = 100000,
-                budgetChangeTableSize = 10
+                budgetChangeHandlingMode = 1
                 )
 
 
@@ -77,13 +75,13 @@ callEa4OpImprover(instanceData$nodeDf, instanceData$arcDf, instanceData$problemD
                   fileSuffix = "",
                   pathToChanges = pathToChanges,
                   pathToDistanceMatrix = pathToDistanceMatrix,
-                  budgetChangeHandlingMode = 1,
-                  minBudgetToHandle = 30000,
+                  budgetChangeHandlingMode = 2,
+                  minBudgetToHandle = 20000,
                   maxBudgetToHandle = 100000,
-                  budgetChangeTableSize = 30
+                  budgetChangeTableSize = 20
 )
 # call GSR (improvement heuristic)
-for (i in 1:10){
+for (i in 1:3){
     # print(i)
     try(
     callGraspSrImprover(instanceData$nodeDf, instanceData$arcDf, instanceData$problemDf, 
