@@ -1,4 +1,6 @@
 ^instances_changes$
+^instances_changes_budget$
+^instances_changes_score$
 ^instances$
 ^initialSolutions$
 ^output$
