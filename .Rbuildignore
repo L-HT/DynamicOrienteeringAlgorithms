@@ -2,7 +2,7 @@
 ^instances$
 ^initialSolutions$
 ^output$
-^solution$
+^solutions$
 ^tests$
 ^tempR$
 ^osmparse$
