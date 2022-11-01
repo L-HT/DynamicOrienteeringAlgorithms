@@ -161,7 +161,6 @@ struct GraspSrSolver : public Solver{
                         bestSolutionQuality_ = tempBestSolutionRes_;
                     }
                     printNodeIdsOfVector(problemData_, currentSolution_);
-
                 }
             } while (!terminationCriterionSatisfied());
         }
@@ -655,7 +654,7 @@ void callGraspSrImprover(const Rcpp::DataFrame& nodeDf,
                          double budget,
                          std::string problemName,
                          unsigned int runNumber,
-                         std::string pathToInitialSolution,
+                         std::string pathToInitialSolution = "",
                          std::string fileSuffix = "",
                          std::string pathToChanges = "",
                          std::string pathToDistanceMatrix ="",
@@ -701,7 +700,9 @@ void callGraspSrImprover(const Rcpp::DataFrame& nodeDf,
                                    budgetChangeTableSize);
     }
     gsrs.calledAsImprover_ = true;
-    gsrs.readInitialSolutionFromFile(pathToInitialSolution);
+    if (pathToInitialSolution != ""){
+        gsrs.readInitialSolutionFromFile(pathToInitialSolution);
+    }
     // waitForInput("beforeRun", DEBUG_ENABLED);
     gsrs.run();
 
