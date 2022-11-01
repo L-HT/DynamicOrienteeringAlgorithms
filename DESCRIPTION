@@ -1,8 +1,8 @@
 Package: DynamicOrienteeringAlgorithms
 Type: Package
 Title: Algorithms for Dynamic Orienteering Problems
-Version: 0.8.0
-Date: 2020-10-27
+Version: 0.8.1
+Date: 2022-10-27
 Author: Hoang Thanh Le
 Maintainer: Hoang Thanh Le <lht@informatik.uni-leipzig.de>
 Description: This package provides some algorithms for the dynamic variant of the Orienteering Problem.
